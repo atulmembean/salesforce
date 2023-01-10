@@ -1,0 +1,93 @@
+<apex:page standardController="Lead" extensions="LocateNearbyAccounts" sidebar="false" showHeader="false">
+    <html>
+        <head>
+            <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" />
+        </head>
+        <body>
+            <apex:form >
+                
+                <div class="container-fluid">
+                    
+                    <div class="row">
+                        
+                        
+                        <div class="page-header" >
+                            <center><h1 style="color:#099AD6;"> Schools currently using or in talk with Membean </h1></center>
+                        </div>
+                    </div> 
+                    <!--<apex:sectionHeader title="Schools currently using or in talk with Membean"  />-->
+                    <div class="row">
+                        
+                        
+                        &nbsp;&nbsp;&nbsp;&nbsp;<apex:commandButton Value="Go Back" action="{!goBack}" style="Width:100px;border-radius: 12px;background:#099AD6;"/> 
+                        
+                        <apex:commandButton value="Go" action="{!getschoolDetails}" reRender="AccountInfo" style="width:100px;float:right;border-radius: 12px;background:#099AD6;"  status="counterStatus" />
+                        <apex:actionStatus id="counterStatus">
+                            <apex:facet name="start">
+                                <center>
+                                    <img src="/img/loading32.gif" />
+                                </center>
+                            </apex:facet>
+                        </apex:actionStatus>
+                        <apex:inputText value="{!radius}" style="float:right;" />
+                        <small style="float:right;color:#099AD6;">
+                            Search By Miles: 
+                        </small> 
+                        <apex:selectList size="4"  value="{!selectedItem}" style="width:250px;float:right;" multiselect="true"  >
+                            <apex:selectOptions value="{!options}"  />
+                        </apex:selectList>
+                        
+                        <small style="float:right;color:#099AD6;">
+                            Search By Category: 
+                        </small>
+                        <apex:selectList size="1"  value="{!selectedRecordType}" style="width:250px;float:right;" multiselect="false"  >
+                            <apex:selectOptions value="{!recordoptions}"  />
+                        </apex:selectList>
+                        <small style="float:right;color:#099AD6;">
+                            Search By Record type: 
+                        </small>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<apex:pageMessages ></apex:pageMessages>
+                        
+                    </div><br/>   
+                    <apex:pageBlock id="AccountInfo" rendered="{!NOT(ISNULL(accWrapper))}">
+                        <apex:pageBlockButtons location="top">
+                            <apex:outputPanel id="myButtons" style="float:right;">
+                                <apex:commandButton title="Begining" value="<<" action="{!Beginning}" disabled="{!disablePrevious}" reRender="myButtons,myPanel" />
+                                <apex:commandButton title="Previous" value="<" action="{!Previous}" disabled="{!disablePrevious}" reRender="myButtons,myPanel" />
+                                <apex:commandButton title="Next" value=">" action="{!Next}" disabled="{!disableNext}" reRender="myButtons,myPanel" />
+                                <apex:commandButton title="End" value=">>" action="{!End}" disabled="{!disableNext}" reRender="myButtons,myPanel" />
+                            </apex:outputPanel>
+                        </apex:pageBlockButtons>
+                        <!-- <apex:pageBlockSection  >-->
+                        <apex:outputPanel id="myPanel">   
+                            <apex:pageBlockTable value="{!accWrapper}" var="acc" rendered="{!NOT(ISNULL(accWrapper))}" >
+                                
+                                <apex:column headerValue="Account Name">
+                                    <apex:outputLink value="/{!acc.accountName}" target="_blank" style="word-wrap: break-word;">{!acc.Name}</apex:outputLink>   
+                                </apex:column>
+                                <apex:column headerValue="Record type" value="{!acc.recordtype}" />
+                                <apex:column headerValue="Catholic School?">
+                                    <apex:outputPanel rendered="{!acc.catholicSchool==True}"> Yes </apex:outputpanel>
+                                    <apex:outputPanel rendered="{!acc.catholicSchool==false}"> No </apex:outputpanel>
+                                </apex:column>
+                                <apex:column headerValue="Subscription Status" value="{!acc.subscriptionStatus}"/>
+                                <apex:column headerValue="Subscription years" value="{!acc.subscriptionYears}"/> 
+                                <apex:column headerValue="Subscriptions Purchased" value="{!acc.subcriptionsPurchased}"/>
+                                <apex:column headerValue="Population" value="{!acc.population}"/>
+                                <apex:column headerValue="Pilot" value="{!acc.pilotStatus}"/>
+                                <apex:column headerValue="State" value="{!acc.billingState}"/>
+                                <apex:column headerValue="Country" value="{!acc.billingCountry}"/>
+                                <apex:column headerValue="Distance"  value="{!acc.distance}"/>
+                                <apex:facet name="footer" ><h4>
+                                    
+                                    Showing Page # {!pageNumber} of {!totalPages} </h4></apex:facet>
+                            </apex:pageBlockTable>
+                            
+                        </apex:outputPanel>     
+                        <!-- </apex:pageBlockSection>-->   
+                    </apex:pageBlock>
+                </div>
+            </apex:form> 
+        </body>
+    </html>      
+</apex:page>

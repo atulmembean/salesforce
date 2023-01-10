@@ -1,0 +1,14 @@
+<aura:component controller="CustomerSuccessController" implements="force:lightningQuickActionWithoutHeader,lightning:actionOverride,force:hasSObjectName,flexipage:availableForRecordHome,force:hasRecordId,force:appHostable,flexipage:availableForAllPageTypes" access="global">
+    
+    <aura:attribute type="String" name="recordId" default="" />
+    <aura:attribute name="customAttribute1" type="opportunity" /> <!-- Attribute - All Opportunity related Information-->
+    
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    <!--<c:SampleCustomerSuccessPage defaultValue="{!v.customAttribute1.Id}"/> -->
+    Create a customer Success?
+    <div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_offline" role="alert">
+        <span class="slds-assistive-text">error</span>
+        
+        <lightning:button variant="brand" label="Create" onclick="{!c.handleClick}"/>
+    </div>
+</aura:component>

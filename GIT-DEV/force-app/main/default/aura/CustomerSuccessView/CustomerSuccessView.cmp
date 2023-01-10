@@ -1,0 +1,402 @@
+<!-- Component for Viewing and editing a customer success record -->
+<aura:component controller="CustomerSuccessController" implements="force:lightningQuickActionWithoutHeader,lightning:actionOverride,force:hasSObjectName,flexipage:availableForRecordHome,force:hasRecordId" access="global">
+    
+    <aura:attribute type="opportunity[]" name="oppList"/>
+    <aura:attribute type="object" name="CustomerSuccessObj"/>
+    <lightning:spinner aura:id="mySpinner" class="slds-hide"/>
+    <aura:attribute name="customAttribute" type="opportunity" /> <!-- Attribute - All Opportunity related Information-->
+    <aura:attribute name="SubscriptionDetails" type="Contract[]"/> <!-- For subscription Details From Account -->
+    <aura:attribute name="objInfo" type="Customer_Success__c" default="{sobjectType : 'Customer_Success__c'}" /> <!-- For Picklist Values -->
+   <!-- <aura:attribute name="defaultValue" type="string" default=""/> -->
+    <aura:attribute name="viewCustomAttribute" type="Customer_Success__c" /> <!-- Attribute - All Opportunity related Information-->
+    <aura:attribute name="selectedLookUpRecord" type="sObject" />
+    <aura:attribute name="Disable" type="Boolean" default="true"/>
+    <aura:attribute name="listOptions" type="List" default="[]"/>
+    <aura:attribute name="defaultOptions" type="List" default="[]"/>
+    <aura:attribute name="requiredOptions" type="List" default="[]"/>
+    <aura:attribute name="IsMultiSelectChange" type="Boolean" default="false"/>
+
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    
+        <lightning:layout horizontalAlign="space" class="backcolor">
+        <lightning:layoutItem flexibility="auto" padding="around-small"  size="5">
+            <div class="slds-box">
+                <lightning:card >
+                    <aura:set attribute="title">
+                    <!--    <label class="slds-form-element__label "><b>Account Name</b></label> <br/> -->
+                        <label  style="cursor:pointer" onclick="{!c.goToSchool}">
+                            <ui:outputText aura:id="accId"  value="{!v.CustomerSuccessObj.accName}" class="slds-input"/> 
+                        </label>
+                    </aura:set>
+                    <p >
+                        <div class="slds-grid slds-wrap">
+                            
+                            <div class="slds-size_1-of-2 slds-p-left_x-large slds-has-divider--top-space">
+                                <p> Population : Purchased : Used</p>                           
+                            </div>
+                            <div  class="slds-size_1-of-2 slds-float_left slds-has-divider--top-space">
+                                <aura:if isTrue="{!v.customAttribute.Account.Population__c != null}">
+                                    <ui:outputText aura:id="oppPop" value="{!v.customAttribute.Account.Population__c}" /> 
+                                    <aura:set attribute="else">
+                                    0
+                                    </aura:set>
+                                </aura:if> :
+                                
+                                <aura:if isTrue="{!v.customAttribute.No_of_Students__c != null}">
+                                    <ui:outputText aura:id="oppno1" value="{!v.customAttribute.Account.No_of_Students__c}" />
+                                    <aura:set attribute="else">
+                                    0
+                                    </aura:set>
+                                </aura:if> :
+                                
+                                <aura:if isTrue="{!v.customAttribute.RPT_Membean_Student_Count__c != null}">
+                                    <ui:outputText aura:id="oppmcnt" value="{!v.customAttribute.RPT_Membean_Student_Count__c}" /><br/>
+                                    <aura:set attribute="else">
+                                    0
+                                    </aura:set>
+                                </aura:if>
+                                
+                            </div>
+                            
+                     <!--       <div class="slds-size_1-of-2 slds-p-left_xx-large slds-has-divider-top-space">
+                                <p>  Purchased : used </p>                           
+                            </div>
+                            <div  class="slds-size_1-of-2 slds-float_left slds-has-divider-top-space">
+                                <aura:if isTrue="{!v.customAttribute.No_of_Students__c != null}">
+                                    <ui:outputText aura:id="oppno2" value="{!v.customAttribute.Account.No_of_Students__c}" /> 
+                                    <aura:set attribute="else">
+                                        0
+                                    </aura:set>
+                                </aura:if> :
+                                
+                                <aura:if isTrue="{!v.customAttribute.RPT_Membean_Student_Count__c != null}">
+                                    <ui:outputText aura:id="oppmcnt" value="{!v.customAttribute.RPT_Membean_Student_Count__c}" /><br/>
+                                    <aura:set attribute="else">
+                                       0
+                                    </aura:set>
+                                </aura:if> 
+                            </div> -->
+                            <div  class="slds-size_1-of-2 slds-p-left_x-large slds-has-divider--top-space">
+                                District Account :
+                            </div>
+                            <div  class="slds-size_1-of-2 slds-float_left slds-has-divider--top-space">
+                                <aura:unescapedHtml value="{! v.viewCustomAttribute.District_Account__c}" />   
+                            </div>
+                            <div  class="slds-size_1-of-2 slds-p-left_x-large slds-has-divider--top-space">
+                                Membean Url :	
+                            </div>
+                            <div  class="slds-size_1-of-2 slds-float_left slds-has-divider--top-space">
+                                <aura:unescapedHtml value="{! v.customAttribute.Account.Membean_URL__c }" />   
+                            </div>
+                        </div>
+                        
+                    </p>
+                </lightning:card>
+                <div class="slds-box slds-m-top_medium" >
+                    <fieldset class="slds-box slds-theme--default slds-container--large">
+                        <legend id="newaccountform" class="slds-text-heading--medium slds-p-vertical--medium"> Subscription</legend>
+                        <table class="slds-table slds-table_bordered slds-table_cell-buffer ">
+                            <thead>
+                                <tr class="slds-text-title_caps ">
+                                  <!--  <th scope="col" class="slds-size-1-of-4">
+                                        <div class="slds-truncate" title="Subscription Name">Subscription Name</div>
+                                    </th> -->
+                                    <th scope="col" class="slds-size--1-of-3">
+                                        <div class="slds-truncate" title="Subscription Start">Start Year</div>
+                                    </th>
+                                    <th scope="col" class="slds-size--1-of-3">
+                                        <div class="slds-truncate" title="Subscription End">End Year</div>
+                                    </th>
+                                    <th scope="col" class="slds-size--1-of-3">
+                                        <div class="slds-truncate" title="Total Count">Total Count</div>
+                                    </th>
+                                    
+                                </tr>
+                                
+                            </thead>
+                            <tbody>
+                                <aura:iteration items="{!v.SubscriptionDetails}" var="subs">
+                                    <tr>
+                                    <!--    <th scope="row" data-label="Opportunity Name">
+                                            <div class="slds-truncate" title="{!subs.ContractNumber}"> {!subs.ContractNumber}</div>
+                                        </th> -->
+                                        <td data-label="Account Name">
+                                            <div class="slds-truncate" title="{!subs.Subscription_Start_Year__c}"> {!subs.Subscription_Start_Year__c}</div>
+                                        </td>
+                                        <td data-label="Close Date">
+                                            <div class="slds-truncate" title="{!subs.Subscription_End_Year__c}">{!subs.Subscription_End_Year__c}</div>
+                                        </td>
+                                        <td data-label="Prospecting">
+                                            <div class="slds-truncate" title="{!subs.No_of_Students__c+subs.No_of_Teachers__c}"> {!subs.No_of_Students__c+subs.No_of_Teachers__c}</div>
+                                        </td>
+                                    </tr>
+                                </aura:iteration>    
+                            </tbody>
+                        </table>
+                    </fieldset>
+                </div>
+                <div class="slds-box slds-m-top_medium" >
+                    <fieldset class="slds-box slds-theme--default slds-container--large">
+                        <legend id="newaccountgrade" class="slds-text-heading--medium slds-p-vertical--medium"> Grade-wise Enrollment</legend>
+                        <table class="slds-table slds-table_bordered slds-table_cell-buffer ">
+                            <thead>
+                                <tr class="slds-text-title_caps ">
+                                    <th scope="col" class="slds-size-1-of-7">
+                                        <div class="slds-truncate" title="Grade_5">5</div>
+                                    </th>
+                                    <th scope="col" class="slds-size-1-of-7">
+                                        <div class="slds-truncate" title="Grade_6">6</div>
+                                    </th>
+                                    <th scope="col" class="slds-size-1-of-7">
+                                        <div class="slds-truncate" title="Grade_7">7</div>
+                                    </th>
+                                    <th scope="col" class="slds-size-1-of-7">
+                                        <div class="slds-truncate" title="Grade_8">8</div>
+                                    </th>
+                                    <th scope="col" class="slds-size-1-of-7">
+                                        <div class="slds-truncate" title="Grade_9">9</div>
+                                    </th>
+                                    <th scope="col" class="slds-size-1-of-7">
+                                        <div class="slds-truncate" title="Grade_10">10</div>
+                                    </th>
+                                    <th scope="col" class="slds-size-1-of-7">
+                                        <div class="slds-truncate" title="Grade_11">11</div>
+                                    </th>
+                                    <th scope="col" class="slds-size-1-of-7">
+                                        <div class="slds-truncate" title="Grade_12">12</div>
+                                    </th>  
+                                </tr>
+                            </thead>
+                            <tbody>
+                                    <tr>
+                                        <td data-label="Grade_5">
+                                            <div class="slds-truncate" title="{!v.customAttribute.Account.Grade_5__c}"> {!v.customAttribute.Account.Grade_5__c}</div>
+                                        </td>
+                                        <td data-label="Grade_6">
+                                            <div class="slds-truncate" title="{!v.customAttribute.Account.Grade_6__c}"> {!v.customAttribute.Account.Grade_6__c}</div>
+                                        </td>
+                                        <td data-label="Grade_7">
+                                            <div class="slds-truncate" title="{!v.customAttribute.Account.Grade_7__c}">{!v.customAttribute.Account.Grade_7__c}</div>
+                                        </td>
+                                        <td data-label="Grade_8">
+                                            <div class="slds-truncate" title="{!v.customAttribute.Account.Grade_8__c}"> {!v.customAttribute.Account.Grade_8__c}</div>
+                                        </td>
+                                        <td data-label="Grade_9">
+                                            <div class="slds-truncate" title="{!v.customAttribute.Account.Grade_9__c}"> {!v.customAttribute.Account.Grade_9__c}</div>
+                                        </td>
+                                        <td data-label="Grade_10">
+                                            <div class="slds-truncate" title="{!v.customAttribute.Account.Grade_10__c}">{!v.customAttribute.Account.Grade_10__c}</div>
+                                        </td>
+                                        <td data-label="Grade_11">
+                                            <div class="slds-truncate" title="{!v.customAttribute.Account.Grade_11__c}"> {!v.customAttribute.Account.Grade_11__c}</div>
+                                        </td>
+                                        <td data-label="Grade_12">
+                                            <div class="slds-truncate" title="{!v.customAttribute.Account.Grade_12__c}"> {!v.customAttribute.Account.Grade_12__c}</div>
+                                        </td>
+                                    </tr>      
+                            </tbody>
+                        </table>
+                    </fieldset>
+                </div>
+                <div class="slds-box">
+                    <div class=" slds-grid slds-wrap">
+                        <div class="slds-size_1-of-1 slds-p-horizontal_small slds-m-top_medium slds-has-divider--top-space">
+                            <lightning:textarea name="callPreps" disabled="{!v.Disable}" aura:id="callPreps" label="Call Prep" value="{!v.CustomerSuccessObj.CallPreps}" />
+                        </div>
+                        
+                        <div class="slds-size_1-of-2 slds-p-horizontal_small slds-has-divider--top-space">
+                            <div aura:id="divErrorAgent" style="color:red" class="slds-hide"> Please enter Agent</div>
+                            <label class="slds-form-element__label" for="select-01">Agent</label>
+                            <ui:inputSelect aura:id="Agent" disabled="{!v.Disable}"  class="slds-select" value="{!v.CustomerSuccessObj.Agent}" change="{!c.onPicklistChange}" required="true"/>
+                        </div>
+                        <div class="slds-size_1-of-2 slds-p-horizontal_small slds-has-divider--top-space">
+                            <div aura:id="divErrorMode" style="color:red" class="slds-hide"> Please enter Mode</div> 
+                            <label class="slds-form-element__label" for="select-01">Mode</label>
+                            <ui:inputSelect aura:id="Mode" disabled="{!v.Disable}"  class="slds-select" value="{!v.CustomerSuccessObj.Mode}" change="{!c.onPicklistChange}" required="true"/>
+                        </div>
+                        <div class="slds-size_1-of-2 slds-p-horizontal_small slds-has-divider--top-space">
+                            <div aura:id="divErrorDirection" style="color:red" class="slds-hide"> Please enter Direction</div> 
+                            <label class="slds-form-element__label" for="select-01">Direction</label> 
+                            <ui:inputSelect aura:id="Direction" disabled="{!v.Disable}" class="slds-select" value="{!v.CustomerSuccessObj.Direction}" change="{!c.onPicklistChange}" />
+                        </div>
+                        <div class="slds-size_1-of-2 slds-p-horizontal_small slds-has-divider--top-space">
+                            <div aura:id="divErrorSource" style="color:red" class="slds-hide"> Please enter Source</div> 
+                            <label class="slds-form-element__label" for="select-01">Source</label> 
+                            <ui:inputSelect aura:id="Source" disabled="{!v.Disable}" class="slds-select" value="{!v.CustomerSuccessObj.Source}" change="{!c.onPicklistChange}"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </lightning:layoutItem>
+        <lightning:layoutItem flexibility="auto" padding="around-small"  size="7">
+            <div class="slds-box">
+                <div class=" slds-grid slds-wrap">
+                    <div class="slds-size_1-of-2 slds-p-horizontal_small slds-has-divider--top-space">
+                        <lightning:input name="custsucname" aura:id="custsucname" disabled="{!v.Disable}" label="Customer Success Name" value="{!v.CustomerSuccessObj.CustomerSuccessName}" messageWhenValueMissing="Please enter the Customer Name" required="true" />
+                    </div>
+                    <div class="slds-size_1-of-2 slds-p-horizontal_small slds-m-top_medium slds-has-divider--top-space">
+                        <label class="slds-form-element__label"><b>Opportunity Name</b></label>
+                        <label  style="cursor:pointer" onclick="{!c.goToOpportunity}">
+                            <ui:outputText aura:id="oppId"  value="{!v.CustomerSuccessObj.oppName}" class="slds-input"/> 
+                        </label>
+                    </div>
+
+                 <!-- @@@@@@@@@@ -->
+                  
+                    <div aura:id="ContactLookup" class="slds-size_1-of-2 slds-p-horizontal_small slds-m-top_medium slds-has-divider-top-space slds-hide">
+                       <div aura:id="divErrorContact" style="color:red" class="slds-hide"> Please enter Contact Name</div>
+                       <c:CustomLookUpGenericComponent objectAPIName="contact" IconName="standard:contact" selectedRecord="{!v.selectedLookUpRecord}" label="Contact Name" accId="{!v.customAttribute.AccountId}"  SearchKeyWord2="{!v.viewCustomAttribute.Contact__r.Name}"/>  
+                    </div>  
+                    
+                    <div aura:id="contOutput" class="slds-size_1-of-2 slds-p-horizontal_small slds-m-top_medium slds-has-divider--top-space slds-show">
+                        <label class="slds-form-element__label"><b>Contact Name</b></label>
+                        <label  style="cursor:pointer" onclick="{!c.goToContact}">
+                            <ui:outputText aura:id="conId"  value="{!v.CustomerSuccessObj.conName}" class="slds-input"/> 
+                        </label>
+                    </div>
+                    
+                    <div  aura:id="extradiv" class="slds-size_1-of-2 slds-p-horizontal_small slds-m-top_medium slds-has-divider-top-space slds-show">    
+                    </div> 
+                 <!--@@@@@@@@@@-->   
+                    <div class="slds-size_1-of-2 slds-p-horizontal_small slds-has-divider--top-space">
+                        <div aura:id="divErrorStatus" style="color:red" class="slds-hide"> Please enter Status</div> 
+                        <label class="slds-form-element__label" for="select-01">Status</label>
+                        <ui:inputSelect aura:id="Status" disabled="{!v.Disable}" class="slds-select" value="{!v.CustomerSuccessObj.Status}" change="{!c.onPicklistChange}"/>
+                    </div>
+                    <div class="slds-size_1-of-2 slds-p-horizontal_small slds-m-top_medium slds-has-divider--top-space">
+                     	<div aura:id="divErrorActivityDate" style="color:red" class="slds-hide"> Please enter Activity Date</div> 
+                        <ui:inputDate aura:id="DueDate" disabled="{!v.Disable}" label="Activity Date" class="slds-input" format="MM-dd-yyyy" labelClass="slds-form-element__label" value="{!v.CustomerSuccessObj.DueDate}" displayDatePicker="true" /> 
+                    </div>
+                    <div class="slds-size_1-of-2 slds-p-horizontal_small slds-m-top_medium slds-has-divider--top-space">
+                        <lightning:textarea name="usage" disabled="{!v.Disable}" aura:id="usage" label="Usage Related Discussion" value="{!v.CustomerSuccessObj.UsageRelatedDiscussion}" />
+                    </div>
+                    <div class="slds-size_1-of-2 slds-p-horizontal_small slds-m-top_medium slds-has-divider--top-space">
+                        <lightning:textarea name="Grading" disabled="{!v.Disable}" aura:id="Grading" label="Grading" value="{!v.CustomerSuccessObj.Grading}" />
+                    </div>
+                    <div class="slds-size_1-of-2 slds-p-horizontal_small slds-m-top_medium slds-has-divider--top-space">
+                        <lightning:textarea name="Testing" disabled="{!v.Disable}" aura:id="Testing" label="Testing" value="{!v.CustomerSuccessObj.Testing}" />
+                    </div>
+                    <div class="slds-size_1-of-2 slds-p-horizontal_small slds-m-top_medium slds-has-divider--top-space">
+                        <lightning:textarea name="Activities" disabled="{!v.Disable}" aura:id="Activities" label="Activities" value="{!v.CustomerSuccessObj.Activities}" />
+                    </div>
+                    <div class="slds-size_1-of-2 slds-p-horizontal_small slds-m-top_medium slds-has-divider--top-space">
+                        <lightning:textarea name="NewFeatures" disabled="{!v.Disable}" aura:id="NewFeatures" label="New Features" value="{!v.CustomerSuccessObj.NewFeature}" />
+                    </div>
+                    <div class="slds-size_1-of-2 slds-p-horizontal_small slds-m-top_medium slds-has-divider--top-space">
+                        <lightning:textarea name="OtherProponents" disabled="{!v.Disable}" aura:id="OtherProponents" label="Other Proponents" value="{!v.CustomerSuccessObj.OtherProponents}" />
+                    </div>
+                    <div class="slds-size_1-of-2 slds-p-horizontal_small slds-m-top_medium slds-has-divider--top-space">
+                        <lightning:textarea name="Comments" disabled="{!v.Disable}" aura:id="Comments" value="{!v.CustomerSuccessObj.Comments}" label="Comments"  />
+                    </div>
+                    <div class="slds-size_1-of-2 slds-p-horizontal_small slds-m-top_medium slds-has-divider--top-space">
+                        <lightning:textarea name="IssuesandConcerns" disabled="{!v.Disable}" aura:id="IssuesandConcerns" value="{!v.CustomerSuccessObj.issuesandConcerns}" label="Issues and Concerns" />
+                    </div>
+                    <div class="slds-size_1-of-2 slds-p-horizontal_small slds-m-top_medium slds-has-divider--top-space">
+                        <lightning:textarea name="Growth" aura:id="Growth" disabled="{!v.Disable}" label="Growth Related Discussion" value="{!v.CustomerSuccessObj.GrowthRelatedDiscussion}" /><br/>
+                    </div>
+                    <div class="slds-size_1-of-2 slds-p-horizontal_small slds-has-divider--top-space">
+                        <div class="slds-size_1-of-1 slds-p-horizontal_small slds-has-divider--top-space">
+                            <div aura:id="divErrorRiskFactor" style="color:red" class="slds-hide"> Please enter Risk Factor</div> 
+                            <label class="slds-form-element__label" for="select-01">Risk Factor</label> 
+                            <ui:inputSelect aura:id="RiskFactor" disabled="{!v.Disable}" class="slds-select" value="{!v.CustomerSuccessObj.RiskFactor}" change="{!c.onPicklistChange}" required="true"/>
+                        </div>
+                        
+                        <div class="slds-size_1-of-1 slds-p-horizontal_small slds-m-top_medium slds-has-divider--top-space">
+                            <div aura:id="divErrorUserRating" style="color:red" class="slds-hide"> Please enter User Rating</div> 
+                            <label class="slds-form-element__label" for="select-01">User Rating</label>
+                            <ui:inputSelect aura:id="UserRating" disabled="{!v.Disable}" class="slds-select" value="{!v.CustomerSuccessObj.UserRating}" change="{!c.onPicklistChange}"/>
+                        </div>
+                        
+                        <div class="slds-size_1-of-1 slds-p-horizontal_small slds-m-top_medium slds-has-divider--top-space">
+                            <div aura:id="divErrorCallFeedback" style="color:red" class="slds-hide"> Please enter Call Feedback</div> 
+                            <label class="slds-form-element__label" for="select-01">Call Feedback</label>
+                            <ui:inputSelect aura:id="CallFeedback" disabled="{!v.Disable}" class="slds-select" value="{!v.CustomerSuccessObj.CallFeedback}" change="{!c.onPicklistChange}"/>
+                        </div> 
+                    </div>
+                    <!--MultiSelect @@@@@@@@ -->
+                <!--    <div class="slds-size_1-of-2 slds-p-horizontal_small slds-has-divider-top-space">
+                        <label class="slds-form-element__label" for="select-01">Risk Reason</label> 
+                        <ui:inputSelect aura:id="RiskReason"  class="slds-select multiple" value="{!v.CustomerSuccessObj.RiskReason}" change="{!c.onMultiSelectChange}" multiple="true"/>
+                    	<label class="slds-form-element__label" for="select-01">Selected Items:</label> 
+     			        <p><ui:outputText class="result" aura:id="multiResult" value="{!v.CustomerSuccessObj.RiskReasonSelected}" /></p>
+                    </div> -->
+
+                    <div class="slds-size_1-of-1 slds-p-horizontal_small slds-has-divider-top-space">
+                        <lightning:dualListbox aura:id="selectOptions" disabled="{!v.Disable}" name="Select Options"  label="Risk Reasons" 
+                                               sourceLabel="Available Options" 
+                                               selectedLabel="Selected Options" 
+                                               options="{!v.listOptions }"
+											   value="{! v.defaultOptions }"                
+                                               onchange="{!c.handleChange }"/>
+                    </div>
+                    <!-- MultiSelect @@@@@@@@ -->
+               <!--     <div class="slds-size_1-of-2 slds-p-horizontal_small slds-m-top_medium slds-has-divider-top-space">
+                        <div aura:id="divErrorUserRating" style="color:red" class="slds-hide"> Please enter User Rating</div> 
+                        <label class="slds-form-element__label" for="select-01">User Rating</label>
+                        <ui:inputSelect aura:id="UserRating1" disabled="{!v.Disable}" class="slds-select" value="{!v.CustomerSuccessObj.UserRating}" change="{!c.onPicklistChange}"/>
+                    </div>
+                    <div class="slds-size_1-of-2 slds-p-horizontal_small slds-m-top_medium slds-has-divider-top-space">
+                        <div aura:id="divErrorCallFeedback" style="color:red" class="slds-hide"> Please enter Call Feedback</div> 
+                        <label class="slds-form-element__label" for="select-01">Call Feedback</label>
+                        <ui:inputSelect aura:id="CallFeedback1" disabled="{!v.Disable}" class="slds-select" value="{!v.CustomerSuccessObj.CallFeedback}" change="{!c.onPicklistChange}"/>
+                    </div> -->
+                   
+                    <!--
+                    <div class="slds-size_1-of-2 slds-p-horizontal_small slds-has-divider-top-space">
+                        <label class="slds-form-element__label" for="select-01">Status</label>
+                        <ui:inputSelect aura:id="Status" disabled="{!v.Disable}" class="slds-select" value="{!v.CustomerSuccessObj.Status}" change="{!c.onPicklistChange}"/>
+                    </div>
+                    <div class="slds-size_1-of-2 slds-p-horizontal_small slds-m-top_medium slds-has-divider-top-space">
+                        <label class="slds-form-element__label "><b>Account Name</b></label>
+                        <label  style="cursor:pointer" onclick="{!c.goToSchool}">
+                            <ui:outputText aura:id="accId"  value="{!v.CustomerSuccessObj.accName}" class="slds-input"/> 
+                        </label>
+                    </div>
+                    <div class="slds-size_1-of-2 slds-p-horizontal_small slds-m-top_medium slds-has-divider-top-space">
+                        <label class="slds-form-element__label"><b>Opportunity Name</b></label>
+                        <label  style="cursor:pointer" onclick="{!c.goToOpportunity}">
+                            <ui:outputText aura:id="oppId"  value="{!v.CustomerSuccessObj.oppName}" class="slds-input"/> 
+                        </label>
+                    </div>
+                    <div class="slds-size_1-of-2 slds-p-horizontal_small slds-m-top_medium slds-has-divider-top-space">
+                        <lightning:textarea name="usage" aura:id="usage" disabled="{!v.Disable}" label="Usage Related Discussion" value="{!v.CustomerSuccessObj.UsageRelatedDiscussion}" />
+                    </div>
+                    <div class="slds-size_1-of-2 slds-p-horizontal_small slds-m-top_medium slds-has-divider-top-space">
+                        <label class="slds-form-element__label" for="select-01">User Rating</label>
+                        <ui:inputSelect aura:id="UserRating" disabled="{!v.Disable}" class="slds-select" value="{!v.CustomerSuccessObj.UserRating}" change="{!c.onPicklistChange}"/>
+                    </div>
+                    <div class="slds-size_1-of-2 slds-p-horizontal_small slds-m-top_medium slds-has-divider-top-space">
+                        <lightning:textarea name="input4" aura:id="myinput4" disabled="{!v.Disable}" label="Growth Related Discussion" value="{!v.CustomerSuccessObj.GrowthRelatedDiscussion}" /><br/>
+                    </div>
+                    <div class="slds-size_1-of-2 slds-p-horizontal_small slds-m-top_medium slds-has-divider-top-space">
+                        <label class="slds-form-element__label" for="select-01">Call Feedback</label>
+                        <ui:inputSelect aura:id="CallFeedback" disabled="{!v.Disable}" class="slds-select" value="{!v.CustomerSuccessObj.CallFeedback}" change="{!c.onPicklistChange}"/>
+                    </div>
+                    <div class="slds-size_1-of-2 slds-p-horizontal_small slds-m-top_medium slds-has-divider-top-space">
+                        <lightning:textarea name="input5" aura:id="myinput5" disabled="{!v.Disable}" value="{!v.CustomerSuccessObj.Comments}" label="Comments"  />
+                    </div>
+                    <div class="slds-size_1-of-2 slds-p-horizontal_small slds-m-top_medium slds-has-divider-top-space">
+                        <lightning:input aura:id="training" disabled="{!v.Disable}" class="slds-m-top_x-large" type="checkbox" value="{!v.CustomerSuccessObj.Training}" label="Training" name="Training" checked="{!v.CustomerSuccessObj.Training}"/> <br/>
+                    </div> -->
+                 <!--   <div class="slds-size_1-of-2 slds-p-horizontal_small slds-m-top_medium slds-has-divider-top-space">
+                    </div> -->
+                  <!--  <div class="slds-size_1-of-2 slds-p-horizontal_small slds-m-top_medium slds-has-divider-top-space">
+                     <ui:inputDate aura:id="DueDate" label="Due Date" class="slds-input" format="MM-dd-yyyy" labelClass="slds-form-element__label" value="{!v.CustomerSuccessObj.DueDate}" displayDatePicker="true" /> 
+                    </div>
+                    <div class="slds-size_1-of-2 slds-p-horizontal_small slds-m-top_medium slds-has-divider-top-space">
+                        <lightning:input aura:id="newfeature" disabled="{!v.Disable}" class="slds-m-top_x-large" type="checkbox" value="{!v.CustomerSuccessObj.NewFeatureExploration}" label="New Feature Exploration" name="New Feature Exploration" checked="{!v.CustomerSuccessObj.NewFeatureExploration}"/> <br/>
+                    </div>-->
+                </div> 
+                <br/>
+                <div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_offline" role="alert">
+                    <span class="slds-assistive-text">error</span>
+                    <lightning:button aura:id="saveRec" variant="brand" label="Save" onclick="{! c.saveRecord }" class="slds-hide"/>  
+                    <lightning:button variant="neutral" label="Edit" onclick="{! c.editRecord }"/> 
+                    <lightning:button iconName="utility:close" variant="neutral" iconPosition="right" label="Close" onclick="{!c.goToOpportunity}"/> <!-- onclick="{!c.closeRecord}"/> -->
+                </div>
+
+            </div>
+                         
+        </lightning:layoutItem>
+    </lightning:layout>
+ </aura:component>

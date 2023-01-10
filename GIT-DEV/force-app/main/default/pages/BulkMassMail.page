@@ -1,0 +1,319 @@
+<apex:page docType="html-5.0" standardController="Account" extensions="AccountMassMailerExt" action="{!reset}">
+<apex:pageMessages />
+
+<apex:stylesheet value="//code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css"/>
+<apex:includeScript value="//code.jquery.com/jquery-1.11.2.js"/>
+<apex:includeScript value="//code.jquery.com/ui/1.11.2/jquery-ui.js"/>
+
+<apex:remoteObjects jsNamespace="RemoteObjectModel">
+    <apex:remoteObjectModel name="Contact" fields="Id,SendBulkEmail__c,Account_Owner_Name__c,Account_Owner_Email__c,MassMailer_Invite_From_Name__c,MassMailer_Invite_From_Email__c">
+    </apex:remoteObjectModel>
+    <apex:remoteObjectModel name="Lead" fields="Id,SendBulkEmail__c,Account_Owner_Name__c,Account_Owner_Email__c,MassMailer_Invite_From_Name__c,MassMailer_Invite_From_Email__c">
+    </apex:remoteObjectModel>
+</apex:remoteObjects>
+
+<script type='text/javascript' src='/canvas/sdk/js/publisher.js'></script>
+
+<script type="text/javascript">
+var email = '{!$User.Email}';
+var fullname = '{!$User.FirstName}' + ' ' + '{!$User.LastName}';
+var runningUserId = "{!$User.Id}";
+//alert(email);
+//alert(fullname);
+//alert(runningUserId );
+var display ='{!proceed}';
+$(document).ready(function()
+{
+    //alert("Ready:Begin");
+    j$ = jQuery.noConflict();
+    j$.ajaxSetup({ cache: false });
+    //alert("Ready:End");
+    //alert(display);
+});
+
+function windowClose()
+{
+    //alert('closing');
+    Sfdc.canvas.publisher.publish({ name: "publisher.close", payload:{ refresh: "true" }});
+}
+
+function checkAll(cb,cbid)
+{
+    //alert('here');
+    var inputElem = document.getElementsByTagName("input");              
+    for(var i=0; i<inputElem.length; i++)
+    {
+        if(inputElem[i].id.indexOf(cbid)!=-1)
+        {         
+           inputElem[i].checked = cb.checked;
+        }
+    }
+    //j$('input:checkbox[id*=" + cbid + "]').prop('checked', cb.checked);
+}
+
+function sendEmail()
+{
+    //alert('sendemail');
+    a = confirm("Are you sure you want to send Emails?");
+    if(a == false)
+        return;
+    var selectedrows = new Array();
+    var table = j$('table[id$=cblktable]');
+    table.find('tr').each(function(index, row)
+    {
+        var allCells = j$(row).find('td');
+        //alert("Length = " + allCells.length);
+        if(allCells.length > 0)
+        {
+            if(j$(row).is(":visible"))
+            {
+                //alert("Inside If");
+                //alert(j$(this).closest("tr").index());
+                allCells.each(function(index, td)
+                {
+                    //alert(j$(td).text);
+                    //if(&& index == 3)//fix if checked here
+                    if(index == 5)
+                    {
+                        console.log('entered')
+                        var input  = j$(td).find('input');
+                        //console.log(typeof(input));
+                        //console.log('is input', input.is('input'));
+                        //console.log(input);
+                        //console.log('selected', input[0].checked);
+                        //children().first().prop('input');
+                        a = input;
+                        //alert("index==4");
+                        if(input[0].checked)
+                        {
+                            //alert("Inside Checked 123");
+                            selectedrows.push(j$(this).closest("tr").index());
+                        }
+                       
+                        //alert('hi');
+                    }
+                });
+            }
+        }
+    });
+    
+    table.find('tr').each(function(index, row)
+    {
+        var allCells = j$(row).find('input:hidden');
+        //alert("Length = " + allCells.length);
+        if(allCells.length > 0)
+        {
+            if(j$(row).is(":visible"))
+            {
+                //alert("Inside If 2");
+                //alert("Second Loop ---> " + j$(this).closest("tr").index());
+                allCells.each(function(index, td)
+                {
+                    //alert(j$(td).text);
+                    if(index == 0)
+                    {
+                        //alert("index == 0");
+                        for(var h=0;h<selectedrows.length;h++)
+                        {
+                            //alert(selectedrows[h] + " ---- " + index);
+                            if(selectedrows[h] == j$(this).closest("tr").index())
+                            {
+                                updateContact(j$(td).val());
+                                //alert(j$(td).val());
+                            }
+                        }
+                    }
+                });
+            }
+        }
+    });
+    
+    
+    selectedrows = new Array();
+    var table = j$('table[id$=lblktable]');
+    table.find('tr').each(function(index, row)
+    {
+        var allCells = j$(row).find('td');
+        //alert("Length = " + allCells.length);
+        if(allCells.length > 0)
+        {
+            if(j$(row).is(":visible"))
+            {
+                //alert("Inside If");
+                //alert(j$(this).closest("tr").index());
+                allCells.each(function(index, td)
+                {
+                    //alert(j$(td).text);
+                    //if(&& index == 3)//fix if checked here
+                    if(index == 5)
+                    {
+                        console.log('entered')
+                        var input  = j$(td).find('input');
+                        //console.log(typeof(input));
+                        //console.log('is input', input.is('input'));
+                        //console.log(input);
+                        //console.log('selected', input[0].checked);
+                        //children().first().prop('input');
+                        a = input;
+                        //alert("index==4");
+                        if(input[0].checked)
+                        {
+                            //alert("Inside Checked 123");
+                            selectedrows.push(j$(this).closest("tr").index());
+                        }
+                       
+                        //alert('hi');
+                    }
+                });
+            }
+        }
+    });
+    
+    table.find('tr').each(function(index, row)
+    {
+        var allCells = j$(row).find('input:hidden');
+        //alert("Length = " + allCells.length);
+        if(allCells.length > 0)
+        {
+            if(j$(row).is(":visible"))
+            {
+                //alert("Inside If 2");
+                //alert("Second Loop ---> " + j$(this).closest("tr").index());
+                allCells.each(function(index, td)
+                {
+                    //alert(j$(td).text);
+                    if(index == 0)
+                    {
+                        //alert("index == 0");
+                        for(var h=0;h<selectedrows.length;h++)
+                        {
+                            //alert(selectedrows[h] + " ---- " + index);
+                            if(selectedrows[h] == j$(this).closest("tr").index())
+                            {
+                                //alert("Something");
+                                //alert(j$(td).val() + " --- " + promid);
+                                //InsertIntoLineItems(promid, j$(td).val());
+                                updateLead(j$(td).val());
+                                //alert(j$(td).val());
+                            }
+                        }
+                    }
+                });
+            }
+        }
+    });
+    Sfdc.canvas.publisher.publish({ name: "publisher.close", payload:{ refresh: "true" }});
+    
+}
+
+
+function updateContact(contactid)
+{
+    try{
+        //alert(contactid);
+    var trueval = true;
+    var record = new RemoteObjectModel.Contact();
+    record.update(contactid,
+    {
+        SendBulkEmail__c: trueval,
+        MassMailer_Invite_From_Name__c: fullname,
+        MassMailer_Invite_From_Email__c: email
+    });
+        return true;
+    }
+    catch(e)
+    {
+        alert(e);
+    }
+}
+
+function updateLead(leadid)
+{
+    try{
+        //alert(leadid);
+    var trueval = true;
+    var record = new RemoteObjectModel.Lead();
+    record.update(leadid,
+    {
+        SendBulkEmail__c: trueval,
+        MassMailer_Invite_From_Name__c: fullname,
+        MassMailer_Invite_From_Email__c: email 
+    });
+        return true;
+    }
+    catch(e)
+    {
+        alert(e);
+    }
+}
+
+
+</script>
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" />
+</head>
+<apex:form >
+    <apex:pageBlock title="">
+    <div align="center">   
+        <apex:commandButton value="Invite" id="SendBtn" immediate="true" styleClass="buttonStyle" style="background:LightBlue;width:80px;" onclick="sendEmail();" rendered="{!proceed}"/>
+        <apex:commandButton value="Close" id="CloseBtn" immediate="true" styleClass="buttonStyle" style="background:LightBlue;width:80px;" onclick="windowClose();"/>
+    </div>     
+        <apex:pageblockSection title="Select Leads" columns="1" rendered="{!proceed}">
+            <apex:pageBlockTable value="{!leadlist}" id="lblktable" var="l">
+                <apex:column headerValue="" style="width:3px" >
+                    <apex:inputHidden value="{!l.Id}" id="lid" / >
+                </apex:column> 
+                <apex:column headerValue="FirstName" style="width:25%">
+                    <apex:outputField value="{!l.FirstName}" id="lfname" / >
+                </apex:column>
+                <apex:column headerValue="LastName" style="width:25%">
+                    <apex:outputField value="{!l.LastName}" id="llname" / >
+                </apex:column>
+                <apex:column headerValue="Email" style="width:25%">
+                    <apex:outputField value="{!l.Email}" id="lemail" / >
+                </apex:column>
+                <apex:column headerValue="Role" style="width:25%">
+                    <apex:outputField value="{!l.Role__c}" id="lrole" / >
+                </apex:column>
+                <apex:column >
+                    <apex:facet name="header">
+                        <apex:inputCheckbox onclick="checkAll(this,'lcheckedone')"/>
+                    </apex:facet>
+                <apex:inputCheckbox id="lcheckedone"/>
+                </apex:column> 
+            <apex:selectCheckboxes value="{!leadIds}" layout="PageDirection">
+                <apex:selectOptions value="{!leadSelect}"/>
+            </apex:selectCheckboxes><br/>
+            </apex:pageBlockTable>
+        </apex:pageblockSection>
+        <apex:pageblockSection title="Select Contacts" columns="1" rendered="{!proceed}">
+            <apex:pageBlockTable value="{!contactlist}" id="cblktable" var="c"> 
+                <apex:column headerValue="" style="width:3px" >
+                    <apex:inputHidden value="{!c.Id}" id="cid" / >
+                </apex:column>
+                <apex:column headerValue="FirstName" style="width:25%">
+                    <apex:outputField value="{!c.FirstName}" id="cfname" / >
+                </apex:column>
+                <apex:column headerValue="LastName" style="width:25%">
+                    <apex:outputField value="{!c.LastName}" id="clname" / >
+                </apex:column>
+                <apex:column headerValue="Email" style="width:25%">
+                    <apex:outputField value="{!c.Email}" id="cemail" / >
+                </apex:column>
+                <apex:column headerValue="Role" style="width:25%">
+                    <apex:outputField value="{!c.Role__c}" id="crole" / >
+                </apex:column>      
+            <apex:selectCheckboxes value="{!contactIds}" layout="PageDirection">
+                <apex:selectOptions value="{!contactSelect}"/>
+            </apex:selectCheckboxes><br/>
+            <apex:column >
+                    <apex:facet name="header">
+                        <apex:inputCheckbox onclick="checkAll(this,'ccheckedone')"/>
+                    </apex:facet>
+                <apex:inputCheckbox id="ccheckedone"/>
+            </apex:column>
+            </apex:pageBlockTable>
+        </apex:pageblockSection>                  
+    </apex:pageBlock>
+</apex:form>
+</apex:page>

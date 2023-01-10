@@ -1,0 +1,94 @@
+<apex:page showHeader="false" sidebar="false" applyHtmlTag="false" applyBodyTag="false">
+    <html>
+        <head>
+            <style>
+                #pagewrap {
+                //width: 94%;
+                width: inherit;
+                }
+    /*               #leftcolumn {
+                width: 33%;                             */
+                /* background-color: #ccff99; */
+                /*min-height: 100px;*/
+    /*          background-color:white;
+                position: absolute;
+                }
+                
+                #rightcolumn {
+                width: 34%;
+                background-color:white;
+                float: right;
+                }
+                #middlecolumn {
+                width: 33%;
+                background-color:white;
+                float: right;
+                } */
+                #leftcolumn {
+                width: 60%;
+                /* background-color: #ccff99; */
+                /*min-height: 100px;*/
+                background-color:white;
+                position: absolute;
+                }
+                #leftcolumn1 {
+                width: 30%;
+                /* background-color: #ccff99; */
+                /*min-height: 100px;*/
+                background-color:white;
+                position: absolute;
+                }
+                #leftcolumn2 {
+                /*width: 40%; */
+                /* background-color: #ccff99; */
+                /*min-height: 100px;*/
+                background-color:white;
+                /* position: absolute;*/
+                /*  float: center; */
+                 padding-left:420px;
+                }
+                #rightcolumn {
+                width: 30%;
+                background-color:white;
+                float: right;
+                padding-right:100px;
+                }
+                
+            </style>
+            <script>
+            function myFunction() {
+                document.getElementsByClassName('refreshButton')[0].click();
+                //var el = document.getElementsByClassName('node closed');
+                location.reload();
+                //setTimeout(function(){ myFunction(); }, 3000);
+            }
+            setTimeout(function(){ myFunction(); }, 600000);
+            </script>
+        </head>
+        <body>
+            <Center><h1><Big><B  style="font-size:50px">Dashboard For Leads</B></Big></h1></Center>
+         <div id="pagewrap"> 
+            <div id="leftcolumn1"> 
+                  <div style="">
+                     <analytics:reportChart size="large" reportId="00O36000007EKqh"></analytics:reportChart>
+                  </div>
+             </div>
+             <div id="rightcolumn"> 
+                 <div style="">
+                     <analytics:reportChart size="large" reportId="00O36000007EhWe"></analytics:reportChart>
+                 </div>
+             </div>
+             <!-- <div id="leftcolumn2"> 
+                  <div style="">
+                         <analytics:reportChart size="medium" reportId="00O5C000000T6As"></analytics:reportChart>
+                  </div>
+             </div> -->
+             <br/><br/>
+             <div style="padding-left:350px;">
+                <analytics:reportChart size="large" reportId="00O36000007Ayv6"></analytics:reportChart>
+             </div>
+         </div> 
+        
+        </body>
+    </html>
+</apex:page>

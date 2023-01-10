@@ -1,0 +1,35 @@
+<apex:page Controller="UpcomingEventsDashboard" showHeader="false" sidebar="false" applyHtmlTag="false" applyBodyTag="false">
+    <html>
+      <head>
+         <!-- <META http-equiv="refresh" content="5" />-->
+         <style type = "text/css">
+        .colHeadr {text-align:center;}     
+    </style>
+          <Script>
+              function myFunction() {
+                //document.getElementsByClassName('refreshButton')[0].click();
+                location.reload();     
+              }
+              setTimeout(function(){ myFunction(); }, 600000);  
+          </Script>   
+    </head>  
+    <Center><h1><Big><B  style="font-size:50px">Upcoming Events</B></Big></h1></Center>
+    <apex:pageBlock rendered="{!NOT(ISNULL(upcomingevents))}">
+       <apex:pageBlockTable value="{!upcomingevents}" var="eve" style="font-size:17px">
+          <!-- <apex:column value="{!eve.ActivityDate}"/>-->
+           <apex:column value="{!eve.StartDateTime}" headerValue="Date/Time" style="width:130px;text-align:center" headerClass="colHeadr"/>
+           <apex:column value="{!eve.Type}" style="width:130px;text-align:Center" headerClass="colHeadr"/>
+         <!--   <apex:column value="{!eve.Account.Name}" style="width:300px"/> -->
+           <apex:column headerValue="Account Name">
+               <apex:outputText value="{!eve.Account.Name}" escape="false"/>
+               <apex:outputText value="{!eve.SchoolAccountName__r.Company}" escape="false"/>
+               <!--   <apex:outputText value="{!eve.LeadAccountName__c}" escape="false"/> -->
+           </apex:column>
+           <apex:column value="{!eve.Who.Name}" headerValue="Contact/Lead" style="width:200px"/>
+            <!--<apex:column value="{!eve.What.Name}"/>-->
+           <apex:column value="{!eve.Subject}" Style="width:200px;word-wrap:break-word" headerClass="colHeadr"/>
+           <apex:column value="{!eve.Owner.Name}" headerValue="Account Manager" style="width:150px;text-align:Center" headerClass="colHeadr"/>
+        </apex:pageBlockTable>
+    </apex:pageBlock>
+    </html>     
+</apex:page>

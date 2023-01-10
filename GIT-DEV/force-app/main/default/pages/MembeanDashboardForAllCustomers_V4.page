@@ -1,0 +1,241 @@
+<apex:page showHeader="false" sidebar="false" controller="OpportunityWonDashBoard" applyHtmlTag="false" applyBodyTag="false" title="Membean Dashboard">
+    <html>
+        <head>
+            <style>
+                body {
+                background-color: white;
+                margin: 0;
+                /*overflow: hidden;*/
+                }
+                
+                /*table{
+                height:600px;
+                overflow:scroll;
+               
+                display:block;
+                } */
+                
+                #wrapper {
+                width: 1005px;
+                margin: 0 auto;
+                position: relative;
+                background-color: red;
+                }
+                #leftcolumn, #rightcolumn {
+                border: 1px solid white;
+                min-height: 750px;
+                color: black;
+                }
+                #leftcolumn {
+                width: 53%;
+                /* background-color: #ccff99; */
+                /*min-height: 100px;*/
+                background-color:white;
+                position: absolute;
+                }
+                #rightcolumn {
+                width: 47%;
+                background-color:white;
+                float: right;
+                }
+                
+                .analyticsCordaChart {
+                width: 302px!important;
+                float: left;
+                margin-left: 18px;
+                matgin-right:12px;
+                }
+                #chartimage {
+                width: 424px!important;
+                }
+                table {
+                border-collapse: collapse;
+                width: 100%;
+                }
+                
+                th, td {
+                text-align: left;
+                padding: 8px;
+                }
+                
+                tr:nth-child(even){background-color:#e6ffcc;} 
+                /************************************************************************************
+                MEDIA QUERIES
+                *************************************************************************************/
+                /* for 980px or less */
+                @media screen and (max-width: 980px) {
+                
+                #pagewrap {
+                //width: 94%;
+                width: inherit;
+                }
+                #content {
+                width: 41%;
+                padding: 1% 4%;
+                }
+                #middle {
+                width: 41%;
+                padding: 1% 4%;
+                margin: 0px 0px 5px 5px;
+                float: right;
+                }
+                
+                #sidebar {
+                clear: both;
+                padding: 1% 4%;
+                width: auto;
+                float: none;
+                }
+                
+                header, footer {
+                padding: 1% 4%;
+                }
+                }
+                
+                /* for 700px or less */
+                @media screen and (max-width: 600px) {
+                
+                #content {
+                width: auto;
+                float: none;
+                }
+                
+                #middle {
+                width: auto;
+                float: none;
+                margin-left: 0px;
+                /*  background:#ccff99;*/   
+                }
+                
+                #sidebar {
+                width: auto;
+                float: none;
+                }
+                
+                }
+                
+                /* for 480px or less */
+                @media screen and (max-width: 480px) {
+                
+                header {
+                height: auto;
+                }
+                h1 {
+                font-size: 2em;
+                }
+                #sidebar {
+                display: none;
+                }
+                
+                }
+                
+                
+            </style>
+            <script>
+            function myFunction() {
+                document.getElementsByClassName('refreshButton')[0].click();
+                //var el = document.getElementsByClassName('node closed');
+                location.reload();
+                //setTimeout(function(){ myFunction(); }, 3000);
+            }
+            setTimeout(function(){ myFunction(); }, 900000);
+            </script>
+        </head>
+        <body>
+            <div id="pagewrap">
+                <div id="leftcolumn">
+                    <div style="width:25%;position:absolute;padding-left:25px;">
+                        <img src="http://crm.membean.com/membean_teacher_registration/logo.png" /> 
+                    </div>
+                    <div style="float:right;position: relative;margin-top:10px;padding-right:25px;">
+                       <!-- <b><i><Span style="font-size:50px">   {!GaugeData[0].name}</span></i></b><br/> -->
+                         <b><i><Span style="font-size:50px"> {!GaugeData2}</span></i></b><br/>
+                        <i><Span style="font-size:20px;padding-left:10px;"> New:   {!NewSchoolCount}</span></i><br/>
+                        <i><Span style="font-size:20px;padding-left:10px;"> Renewals:   {!RenewalSchoolCount}</span></i><br/>
+                        <i><Span style="font-size:20px;padding-left:10px;"> Returning:   {!ReturningSchoolCount}</span></i><br/>
+                    </div>
+                    <div style="position:absolute;margin-top:180px;">
+                        <div style="float:left;width:28%;">
+                            <b><i><Span style="font-size:50px;padding-left:100px;">{!countOppwonList}</span></i></b>
+                            <section id="content" style="padding-left:5px;"> <!-- padding-left:10px; -->
+                                <table style="border: solid 1px #ccc;"> 
+                                    <thead > <th  colspan="2" align="center" style="font-size:18px;">Opportunities Won This Week</th>
+                                        
+                                        <tr style="font-weight:bold;">
+                                            <th >School Name</th>
+                                            <th>Users</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <apex:repeat value="{!oppwonList}" var="op">
+                                            <tr>
+                                                <td style="height:20;">{!op.Account.Name}</td>
+                                                <td style="height:20;">{!op.Total_Users__c}</td>
+                                            </tr>    
+                                        </apex:repeat>
+                                    </tbody>
+                                </table>
+                            </section> 
+                        </div> &nbsp;
+                        <div style="float:right;">
+                            <b><i><Span style="font-size:50px;padding-left:100px;">{!countOppListToday}</span></i></b>
+                            <section id="middle" style="width:28%;padding-left:25px;">
+                                <table style="border: solid 1px #ccc;">
+                                    <thead > <th  colspan="2" align="center" style="font-size:18px;">Opportunities Won Today</th>
+                                        <tr>
+                                            <th>School Name</th>
+                                            <th>Users</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <apex:repeat value="{!oppListtoday}" var="op">
+                                            <tr>
+                                                <td style="height:20;">{!op.Account.Name}</td>
+                                                <td style="height:20;">{!op.Total_Users__c}</td>
+                                            </tr>    
+                                        </apex:repeat>
+                                    </tbody>
+                                </table>
+                            </section>
+                        </div>
+                   </div>
+                </div> 
+                <div id="rightcolumn">
+                    <br/>
+                    <div> <span style="padding-top:14px;background-color:#333435;">
+                        <center style="font-size:18px;font-weight:bold;padding-right:170px;">Progress towards the targets</center></span>
+                        <apex:chart name="Total amount invoiced" height="300" width="400" animate="true" data="{!GaugeData}" >
+                           <!-- <apex:axis type="Gauge" position="gauge" title="{!GaugeData[0].name}"  minimum="0" maximum="1400" /> -->
+                             <apex:axis type="Gauge" position="gauge" title="{!GaugeData2}"  minimum="0" maximum="1400" />
+                            <apex:gaugeSeries dataField="name" donut="50" colorSet="#78c953,#ddd"/>
+                        </apex:chart>
+                    </div>
+                    <div style="width:50px;!important;">
+                        <analytics:reportChart size="huge" reportId="00O36000006eg7P"></analytics:reportChart>
+                    </div>
+                   <!-- <div style="width:50px;!important;">
+                        <br/><br/>
+                        <section id="middle" style="width:98%;padding-left:95px;">
+                                <table style="border: solid 1px #ccc;width:100%">
+                                    <thead > <th  colspan="2" align="center" style="font-size:18px;">Customers By State Top 10</th>
+                                        <tr>
+                                            <th>State</th>
+                                            <th>Total Count</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <apex:repeat value="{!customersByState}" var="r">
+                                            <tr>
+                                                <td style="height:20;">{!r['billingstate']}</td>
+                                                <td style="height:20;">{!r['counts']}</td> 
+                                            </tr>    
+                                        </apex:repeat>
+                                    </tbody>
+                                </table>
+                            </section>
+                    </div> -->
+                </div>
+            </div>
+        </body>
+    </html>
+</apex:page>

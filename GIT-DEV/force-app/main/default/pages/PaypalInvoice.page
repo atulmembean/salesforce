@@ -1,0 +1,153 @@
+<apex:page standardStylesheets="false" sidebar="false" showHeader="false" applyBodyTag="false" applyHtmlTag="false" docType="html-5.0" controller="GeneratePaypalInvoice">
+    
+    <apex:variable var="invo" value="{!inv}" />
+    <apex:variable var="invl" value="{!invLineItms}" />
+    
+    <html lang="en">
+        <head>
+            <title>Generate Paypal Invoice</title>
+        </head>    
+    <body>
+        
+    <p>Creating Paypal Invoice...</p>    
+        
+    <script>
+        
+        var Invo = {};
+        var InvoLineItems;
+        
+     
+        createPaypalInvoice = function(){
+                    
+            console.log('Inside invoice creation');
+            
+            
+            var items = new Array();
+                    InvoLineItems.map((Ili)=>{
+                         items.push({
+                            "name": Ili.Product__r.Family,
+                            "description": Ili.Description_Line_Item__c,
+                            "quantity": Ili.Quantity__c,
+                            "unit_amount": {
+                                "currency_code": "USD",
+                                "value": Ili.Unit_Price__c
+                            },
+                            "discount": {
+                                "percent": "0"
+                            },
+                            "unit_of_measure": "QUANTITY"
+                         })   
+                    })
+                    
+                   
+                    
+                    
+                    var today = new Date();
+                    var dd = String(today.getDate()).padStart(2, '0');
+                    var mm = String(today.getMonth() + 1).padStart(2, '0');
+                    var yyyy = today.getFullYear();
+                    
+                    today = yyyy + '-' + mm + '-' + dd;                     
+        
+                    var inv_date = new Date(Invo.Date__c);
+                    var due_date = new Date(Invo.Due_Date__c);
+        
+                      
+        
+                    inv_date = inv_date.getFullYear() + '-' + String(inv_date.getMonth() + 1).padStart(2, '0') + '-' + String(inv_date.getDate()).padStart(2, '0');
+                    due_date = due_date.getFullYear() + '-' + String(due_date.getMonth() + 1).padStart(2, '0') + '-' + String(due_date.getDate()).padStart(2, '0');
+                                               
+                    var invoiceDetails = {
+                        "detail": {
+                            "invoice_number": Invo.Name,                            
+                            "invoice_date": inv_date,
+                            "currency_code": "USD",
+                            "note": "Thank you for your business.",
+                            "terms_and_conditions": "This Invoice sets forth the products/services to be provided by Membean, Inc. (\"Membean\") to the entity referenced above (\"Customer\") and is governed by the terms of the clickwrap \"Terms of Service\" located at http://membean.com/agreement (the \"Agreement\"). Your use of the products/services and/or payment of the fees described above constitutes your acceptance of the Agreement.",
+                            "memo": "This is a long contract",
+                            "payment_term": {
+                                "term_type": "DUE_ON_DATE_SPECIFIED",
+                                "due_date": due_date
+                            }
+                        },
+                        "invoicer": {
+                            "name": {
+                                "given_name": "Membean,",
+                                "surname": "Inc."
+                            },
+                            "address": {
+                                "address_line_1": "10940 SW Barnes Road",
+                                "address_line_2": " #233 Portland",                                                 
+                                "admin_area_1": "OR",
+                                "postal_code": "97225",
+                                "country_code": "US"
+                            },                            
+                            "email_address": "accts@membean.com",
+                            "phones": [
+                                {
+                                    "country_code": "1",
+                                    "national_number": "8669306680",
+                                    "phone_type": "MOBILE"
+                                }
+                            ],
+                            "website": "www.membean.com",                                             
+                            "logo_url": "https://pics.paypal.com/00/s/MjYwWDg5MFhQTkc/p/ZGM4OTZkMDgtZjYyOC00N2EwLTgwZDMtMDNmNjJkMTE3MThi/image_109.PNG"
+                            
+                        },
+                        "primary_recipients": [
+                            {
+                                "billing_info": {
+                                    "name": {
+                                        "given_name": Invo.Contact__r.Name,
+                                        "surname": ""
+                                    },
+                                    "address": {
+                                        "address_line_1": Invo.Billing_Street__c,
+                                        "admin_area_2": Invo.Billing_City__c,
+                                        "admin_area_1": Invo.Billing_State_Province__c,
+                                        "postal_code": Invo.Billing_Zip_Postal_Code__c,
+                                        "country_code": "US"
+                                    },
+                                    "email_address": Invo.Contact__r.Email
+                                }
+                            }
+                        ],
+                        "items": items
+                    };
+        
+            if(Invo.P_O_Number__c){
+                 invoiceDetails.detail = Object.assign(invoiceDetails.detail,{"reference": Invo.P_O_Number__c});       
+            }  
+        
+            console.log(invoiceDetails);                                                                   
+                                                    
+            GeneratePaypalInvoice.createPaypalInvoice(JSON.stringify(invoiceDetails),Invo.Id,(res,evt)=>{
+                console.log('res==='+res);
+                if(res.includes('Paypal Invoice generation Failed')==TRUE){
+                    alert("Paypal Invoice not created! "+res);
+                }
+                console.log(Invo.Id);                
+                window.top.location='/'+Invo.Id;               
+                
+            }) 
+
+     }
+                
+                
+     window.onload = function(){
+            GeneratePaypalInvoice.getInvoiceDetails('{!$CurrentPage.parameters.id}',(res,evt)=>{
+                Invo = res[0];
+                InvoLineItems = res[1];
+                
+                console.log(Invo);
+                createPaypalInvoice();
+                
+            });            
+     }
+                                            
+    </script>
+    
+    </body> 
+    </html>    
+    
+</apex:page>

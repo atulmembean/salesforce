@@ -1,0 +1,715 @@
+<apex:page standardStylesheets="false" sidebar="false" showHeader="false" applyBodyTag="false" applyHtmlTag="false" docType="html-5.0" controller="SplitSchoolDetailsController_v1">
+    <html lang="en" ng-app="demoApp">
+        <head>
+            <title>Generate Invoice</title>
+            
+            <c:Libraries />
+            
+            <script>
+                j$ = jQuery.noConflict();
+            
+                j$(document).ready(function(){
+                j$( "#duedateName" ).datepicker(
+                    {
+                        defaultDate: "+1w",
+                        changeMonth: true,
+                        changeYear: true,
+                        numberOfMonths: 1,
+                        dateFormat:"mm-dd-yy",
+                        altField: "#event_start_date_alternate",
+                        altFormat: "yyyy-mm-dd",
+                        showAnim: "slide"
+                    })
+            });
+
+            
+            // define the app
+            var demoApp = angular.module('demoApp', ['ui.directives']);
+            // add the controller
+            demoApp.controller('DemoCtrl', function ($scope) {
+                
+                $scope.dateOptions = {
+                    formatYear: 'yy',
+                    startingDay: 1
+                };
+                $scope.format = 'yyyy/MM/dd';
+                // Code for date functionality
+                $scope.opts = {
+                    dateFormat: 'mm-dd-yy',
+                    changeMonth: true,
+                    changeYear: true
+                };
+                
+                $scope.optsss = {
+                    dateFormat: 'mm-dd-yy',
+                    changeMonth: true,
+                    changeYear: true
+                };
+                $scope.changedateFormat = function(datee){
+                    return datee.getFullYear()+'-'+(datee.getMonth() + 1)+'-'+datee.getDate();
+                }
+                
+                $scope.selectedStudents = 0;
+                $scope.selectedTeachers = 0;
+                $scope.showSubmitButton = false;
+                $scope.showErrorForStudents = false;
+                $scope.showErrorForTeachers = false;
+                $scope.showErrorIfTeacherorStudentZero = false; //Added
+                $scope.loadbol=false;
+                $scope.selectedAmountProgress=0;
+                $scope.Disablesave = false;
+                $scope.Split=false;
+                // $scope.showInput=false;
+                $scope.showInput=true;
+                $scope.showCreate=true;
+                $scope.showTableToSplit=false;
+                $scope.splitNumber = 1;
+                $scope.hideExtraFields=true;    
+                $scope.payTerms = [];
+                $scope.InvNumber= 'INV-123';
+                $scope.disableDueDate = true;
+                $scope.disableInvNumber = true;
+               
+                $scope.payTerms = JSON.parse('{!payTerms}');
+                console.log('payTerms is'+$scope.payTerms);
+                //$scope.selectedPayTerms='--NONE--';
+                $scope.selectedPayTerms='Net-30';
+                
+               
+                var currentDate = new Date();
+                console.log(todaysDate);                
+                $scope.dueDate= currentDate;
+                var numberOfDaysToAdd = 30;
+                $scope.dueDate =new Date( $scope.dueDate.setDate($scope.dueDate.getDate() + numberOfDaysToAdd)); 
+                console.log($scope.dueDate);
+                console.log(($scope.dueDate.getMonth()+1)+'-'+ $scope.dueDate.getDate() +'-'+ $scope.dueDate.getFullYear());
+                $scope.dueDate=(($scope.dueDate.getMonth()+1)+'-'+ $scope.dueDate.getDate() +'-'+ $scope.dueDate.getFullYear());
+              
+                $scope.changeDueDate=function(paytermValue){
+                    debugger;
+                    console.log('the invoice date is'+$scope.datenow);
+                    $scope.datenow=new Date($scope.datenow);
+                    console.log('the invoice date is'+$scope.datenow);
+                    if(paytermValue=='Net-45'){
+                        var currentDate2 = new Date();
+                        //$scope.dueDate=currentDate2;
+                        $scope.dueDate=$scope.datenow;
+                        $scope.dueDate =new Date( $scope.dueDate.setDate($scope.dueDate.getDate() + 45));
+                        $scope.dueDate=(($scope.dueDate.getMonth()+1)+'-'+ $scope.dueDate.getDate() +'-'+ $scope.dueDate.getFullYear());
+                        console.log('$scope.dueDate for 45'+$scope.dueDate);
+                        $scope.disableDueDate = true;
+                    }else if(paytermValue=='Net-60'){
+                        var currentDate2 = new Date();
+                        //$scope.dueDate=currentDate2;
+                        $scope.dueDate=$scope.datenow;
+                        $scope.dueDate =new Date( $scope.dueDate.setDate($scope.dueDate.getDate() + 60));
+                        $scope.dueDate=(($scope.dueDate.getMonth()+1)+'-'+ $scope.dueDate.getDate() +'-'+ $scope.dueDate.getFullYear());
+                        console.log('$scope.dueDate for 60'+$scope.dueDate);
+                        $scope.disableDueDate = true;
+                    }else if(paytermValue=='Net-15'){
+                        var currentDate2 = new Date();
+                        //$scope.dueDate=currentDate2;
+                        $scope.dueDate=$scope.datenow;
+                        $scope.dueDate =new Date( $scope.dueDate.setDate($scope.dueDate.getDate() + 15));
+                        $scope.dueDate=(($scope.dueDate.getMonth()+1)+'-'+ $scope.dueDate.getDate() +'-'+ $scope.dueDate.getFullYear());
+                        console.log('$scope.dueDate for 15'+$scope.dueDate);
+                        $scope.disableDueDate = true;
+                    }else if(paytermValue=='Net-30'){
+                        var currentDate2 = new Date();
+                        //$scope.dueDate=currentDate2;
+                        $scope.dueDate=$scope.datenow;
+                        $scope.dueDate =new Date( $scope.dueDate.setDate($scope.dueDate.getDate() + 30));
+                        $scope.dueDate=(($scope.dueDate.getMonth()+1)+'-'+ $scope.dueDate.getDate() +'-'+ $scope.dueDate.getFullYear());
+                        console.log('$scope.dueDate for 30'+$scope.dueDate);
+                        $scope.disableDueDate = true;
+                    }else if(paytermValue=='Custom'){
+                        console.log('in custom');
+                        $scope.disableDueDate = false;
+                        console.log($scope.disableDueDate);
+                    }
+                     console.log('$scope.dueDate'+$scope.dueDate);
+                     
+                 }
+                 
+                 var todaysDate=new Date();
+                
+                $scope.datenow= new Date(todaysDate.getFullYear(),todaysDate.getMonth(),todaysDate.getDate());
+                var fdd=new Date($scope.datenow);
+                var fdt=(fdd.getMonth()+1)+'-'+fdd.getDate()+'-'+fdd.getFullYear();
+                $scope.datenow=fdt;
+                //$scope.datenow=(todaysDate.getMonth()+1)+'-'+todaysDate.getDate()+'-'+todaysDate.getFullYear();
+                //$scope.datenow=todaysDate;
+                console.log(todaysDate.getFullYear());
+                console.log(todaysDate.getMonth());
+                console.log(todaysDate.getDate());
+                $scope.QuoteLineValues={!QuoteLineValues};
+                $scope.QuoteInvoiceValues={!QuoteInvoiceValues};
+                $scope.QuoteInvoiceLineValues={!QuoteInvoiceLineValues};
+                $scope.QuoteRecords={!QuoteRecords};
+                console.log('$scope.QuoteRecords');console.log($scope.QuoteRecords);
+                if($scope.QuoteRecords.Opportunity.Account.BillingCountry ==undefined || $scope.QuoteRecords.Opportunity.Account.BillingCountry==null){
+                    $scope.QuoteRecords.Opportunity.Account.BillingCountry=' ';
+                }
+                if($scope.QuoteRecords.Opportunity.Account.BillingCity ==undefined || $scope.QuoteRecords.Opportunity.Account.BillingCity==null ){
+                    $scope.QuoteRecords.Opportunity.Account.BillingCity=' ';
+                }
+                 if($scope.QuoteRecords.Opportunity.Account.BillingState ==undefined || $scope.QuoteRecords.Opportunity.Account.BillingState==null ){
+                    $scope.QuoteRecords.Opportunity.Account.BillingState=' ';
+                }
+                 if($scope.QuoteRecords.Opportunity.Account.BillingStreet ==undefined || $scope.QuoteRecords.Opportunity.Account.BillingStreet==null){
+                    $scope.QuoteRecords.Opportunity.Account.BillingStreet=' ';
+                }
+                 if($scope.QuoteRecords.Opportunity.Account.BillingPostalCode ==undefined || $scope.QuoteRecords.Opportunity.Account.BillingPostalCode==null){
+                    $scope.QuoteRecords.Opportunity.Account.BillingPostalCode=' ';
+                }
+                console.log($scope.QuoteRecords.Opportunity.Teacher__c + '***' +$scope.QuoteRecords.Count_Quantity__c);
+                $scope.quoteId='{!Quoteid}';
+                console.log($scope.quoteId);
+                
+                console.log('Todays date is'+$scope.datenow);
+                $scope.presentDate= new Date(todaysDate.getFullYear(),todaysDate.getMonth(),todaysDate.getDate());
+                $scope.subsStartDate= new Date(2020,8,1); //1st of September (8)
+                $scope.subsEndDate = new Date(2021,7,1); //1st of August(7)
+                if($scope.presentDate > $scope.subsStartDate && $scope.presentDate < $scope.subsEndDate ){
+                    $scope.subsStartDate = $scope.presentDate;
+                    console.log($scope.subsStartDate);
+                }console.log('***********'+$scope.subsStartDate);
+                $scope.subsStartDate = (($scope.subsStartDate.getMonth()+1)+'-'+$scope.subsStartDate.getDate() +'-'+ $scope.subsStartDate.getFullYear());
+                
+                $scope.subsMonth=12;
+                $scope.changeDuration = function(subsstartDate){
+                    $scope.newsubsstartDate = new Date(subsstartDate);
+                    $scope.subsEndDate =  new Date($scope.subsEndDate);
+                    var a = $scope.newsubsstartDate ;
+                    var b = $scope.subsEndDate;
+                    
+                    // Months between years.
+                    var months = (b.getFullYear() - a.getFullYear()) * 12;
+                    console.log('&&months'+months);
+                    // Months between... months.
+                    console.log('b.getMonth()'+b.getMonth() +'a.getMonth()'+a.getMonth());
+                    months += b.getMonth() - a.getMonth();
+                    months=months+1;
+                    console.log('##months'+months);
+                    /*   // Subtract one month if b's date is less that a's.
+                    if (b.getDate() < a.getDate())
+                    {
+                        months--;
+                        console.log('entered here'+b.getDate()+'**'+a.getDate());
+                    } */
+                    console.log('months'+months);
+                    $scope.subsMonth=months;
+                    console.log('Entered the method'+subsstartDate);
+                    if($scope.QuoteRecords.No_Years__c>1){
+                        $scope.subsYear=$scope.QuoteRecords.No_Years__c;
+                        $scope.subsYear-=1;
+                        $scope.subsMonth=$scope.subsMonth+($scope.subsYear * 12);
+                        console.log('$scope.subsMonth for multiyear'+$scope.subsMonth);
+                    }
+                    
+                }
+                
+                $scope.changeDuration($scope.subsStartDate);
+                
+           
+                debugger;
+                for(var i=0;i<$scope.QuoteLineValues.length;i++){
+                    //==============================
+                    $scope.QuoteLineValues[i].input=[{},{}];
+                }
+                
+                console.log('@@@@@@');
+                console.log($scope.QuoteLineValues);
+                /***added**/
+                var allInvoicesValuesarray=[];
+                debugger;
+                for(var i=0;i<$scope.QuoteInvoiceValues.length;i++){
+                    var invoiceRecord = {};
+                    invoiceRecord.InvoiceItem={'Quote__c':$scope.quoteId};
+                    invoiceRecord.AllLineItems=[];
+                    for(var j=0;j<$scope.QuoteInvoiceLineValues.length;j++){
+                        if($scope.QuoteInvoiceLineValues[j].Invoice__c == $scope.QuoteInvoiceValues[i].Id){
+                            var invoiceLineItem={'Quantity__c':$scope.QuoteInvoiceLineValues[j].Quantity__c,'Amount__c':$scope.QuoteInvoiceLineValues[j].Amount__c,'Product__c':$scope.QuoteInvoiceLineValues[j].Product__c};
+                            invoiceRecord.AllLineItems.push(invoiceLineItem);
+                        }
+                    }
+                    allInvoicesValuesarray.push(invoiceRecord);
+                }
+                console.log('allInvoicesValuesarray is here');
+                console.log(allInvoicesValuesarray);
+                for(var i=0;i<allInvoicesValuesarray.length;i++){
+                    debugger;
+                    for(var j=0;j<allInvoicesValuesarray[i].AllLineItems.length;j++){
+                        $scope.QuoteLineValues[j].input[i].Quantity__c=allInvoicesValuesarray[i].AllLineItems[j].Quantity__c;
+                        //$scope.QuoteLineValues[i].input[j].Quantity__c=10;
+                        
+                    }
+                }
+                
+                /*****added ends****/
+                
+                console.log($scope.QuoteLineValues);
+                console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
+                console.log($scope.QuoteInvoiceValues);
+                console.log($scope.QuoteInvoiceLineValues);
+                $scope.selectedAmountProgress = $scope.TotalAmountValues/5000 * 100;
+                for(var i=0;i<$scope.QuoteLineValues.length;i++){
+                    $scope.QuoteLineValues[i].TotalAmountValues=0;
+                }
+                $scope.isSplit=function(isTrue){
+                    if(isTrue > 1){
+                        $scope.Split=true; 
+                        // $scope.showInput=true;
+                        $scope.showCreate=false;
+                        $scope.showSplit=true;
+                    }else{
+                        $scope.Split=false;
+                        //$scope.showInput=false;
+                        $scope.showCreate=true;
+                        $scope.showSplit=false;
+                        $scope.showTableToSplit=false;
+                        $scope.Disablesave=false;
+                    }
+                    console.log('the value of split is :'+$scope.Split);
+                };
+                $scope.callFuncSplit = function(splitNumber){
+                    $scope.splitNumber = splitNumber;
+                    
+                    $scope.divs = new Array();
+                    $scope.inputsBox=new Array();
+                    //I added a button & invoked this function on its ng-click
+                    var a = $scope.splitNumber;
+                    $scope.divs.push(' ');
+                    $scope.divs.push('Product Name');
+                    $scope.divs.push('Quantity');
+                    $scope.divs.push('UnitPrice');
+                    for(i=0;i<a;i++)
+                    {
+                        $scope.divs.push('Invoice'+''+(i+1));
+                        $scope.inputsBox.push(i+1);
+                    }
+                    //  alert($scope.divs);
+                    //  alert('$scope.inputsBox'+$scope.inputsBox);
+                    
+                    console.log('$scope.splitNumber'+$scope.splitNumber);
+                    console.log('its in the call split');
+                    if($scope.splitNumber <= 1){
+                        alert('Split should be more then or equal to 2');
+                        $scope.showTableToSplit=false;
+                    }else{
+                        $scope.showTableToSplit=true;
+                        $scope.splitNumber = splitNumber;
+                    }
+                }
+                if($scope.QuoteInvoiceValues.length >1){
+                    console.log('its in the quote invoice length');
+                    $scope.Split=true;
+                    $scope.splitNumber = $scope.QuoteInvoiceValues.length;
+                    $scope.showInput=true;
+                    $scope.showTableToSplit=true;
+                    $scope.showSplit=true;
+                    $scope.showCreate=false;
+                    $scope.callFuncSplit($scope.splitNumber); 
+                }
+                console.log($scope.Split);
+                console.log($scope.splitNumber);
+                if($scope.QuoteInvoiceValues.length >=1){
+                    $scope.hideExtraFields=false;
+                    $scope.showCreate=false;
+                }
+               
+                $scope.saveInvoicerecords = function(){
+                    debugger;
+                    $scope.loadbol=true;
+                    //   var subsdate =$scope.changedateFormat($scope.subsStartDate);
+                    //  console.log('$scope.subsStartDate'+subsdate);
+                    console.log($scope.subsStartDate);
+                    $scope.subsStartDate=new Date($scope.subsStartDate);
+                    if($scope.subsStartDate != undefined && $scope.subsStartDate != null && $scope.subsStartDate != ''){
+                        $scope.subsStartDate=$scope.changedateFormat($scope.subsStartDate);
+                    }
+                    if((todaysDate.getMonth()+1)+'-'+todaysDate.getDate()+'-'+todaysDate.getFullYear() == $scope.datenow ){
+                        $scope.datenow=todaysDate;
+                    }
+                    $scope.datenowFormat = $scope.datenow;
+                    if($scope.datenowFormat != undefined && $scope.datenowFormat != null && $scope.datenowFormat != ''){
+                        $scope.datenowFormat = $scope.changedateFormat($scope.datenow);
+                    }
+                    
+                    $scope.dueDate=new Date($scope.dueDate);
+                    console.log($scope.dueDate);
+                    if($scope.dueDate != undefined && $scope.dueDate != null && $scope.dueDate != ''){
+                        $scope.dueDate = $scope.changedateFormat($scope.dueDate);
+                    }
+                    console.log(' $scope.subsStartDate '+ $scope.subsStartDate );
+                    console.log('$scope.datenowFormat ***'+$scope.datenowFormat);
+                    console.log('$scope.selectedPayTerms'+$scope.selectedPayTerms);
+                    if($scope.selectedPayTerms == '--NONE--'){
+                        $scope.selectedPayTerms='';
+                    }
+                    
+                    console.log($scope.QuoteLineValues);
+                    $scope.arrayList ={};
+                    var log = [];
+                    
+                    var x;
+                    var allInvoicesarray=[];
+                    if($scope.Split==true){
+                        for(var i=0;i<$scope.QuoteLineValues.length;i++){
+                            
+                            if(allInvoicesarray.length != $scope.splitNumber){
+                                
+                                for(var j=0;j< $scope.splitNumber;j++){
+                                    //$scope.QuoteLineValues[i].input[j.toString()]
+                                    console.log($scope.QuoteLineValues[i].input[j.toString()]);
+                                    var invoiceRecord ={};
+                                    //invoiceRecord.Quote__c = $scope.quoteId;
+                                    console.log('its product2.id');
+                                    console.log($scope.QuoteLineValues[i]);
+                                    console.log($scope.QuoteLineValues[i].Product2Id);
+                                    /*   invoiceRecord.InvoiceItem={'Name':$scope.InvNumber,'Quote__c':$scope.quoteId,'Date__c':$scope.datenowFormat,'Subscription_Start_Date__c':$scope.subsStartDate,'Subscription_Month__c':$scope.subsMonth,'Payment_Terms__c':$scope.selectedPayTerms,'P_O_Number__c':$scope.poNumber,'Contact__c':$scope.QuoteRecords.Opportunity.Teacher__c,'Due_Date__c':$scope.dueDate,'No_of_Years__c':$scope.QuoteRecords.No_Years__c};
+                                    var invoiceLineItem={'Quantity__c':$scope.QuoteLineValues[i].input[j.toString()].Quantity__c,'Amount__c':$scope.QuoteLineValues[i].input[j.toString()].Quantity__c * $scope.QuoteLineValues[i].UnitPrice,'Product__c':$scope.QuoteLineValues[i].Product2Id,'Unit_Price__c':$scope.QuoteLineValues[i].UnitPrice,'Description__c':$scope.QuoteLineValues[i].Quote_PDF_Description__c,'Total_Amount__c':$scope.QuoteRecords.No_Years__c * $scope.QuoteLineValues[i].UnitPrice * $scope.QuoteLineValues[i].input[j.toString()].Quantity__c};
+                                   */
+                                    invoiceRecord.InvoiceItem={'Quote__c':$scope.quoteId,'Date__c':$scope.datenowFormat,'Subscription_Start_Date__c':$scope.subsStartDate,'Subscription_Month__c':$scope.subsMonth,'Payment_Terms__c':$scope.selectedPayTerms,'P_O_Number__c':$scope.poNumber,'Contact__c':$scope.QuoteRecords.Opportunity.Teacher__c,'Due_Date__c':$scope.dueDate,'No_of_Years__c':$scope.QuoteRecords.No_Years__c,'Account_of_Contact__c':$scope.QuoteRecords.Opportunity.AccountId,'Billing_Country__c':$scope.QuoteRecords.Opportunity.Account.BillingCountry,'Billing_City__c':$scope.QuoteRecords.Opportunity.Account.BillingCity,'Billing_State_Province__c':$scope.QuoteRecords.Opportunity.Account.BillingState,'Billing_Street__c':$scope.QuoteRecords.Opportunity.Account.BillingStreet,'Billing_Zip_Postal_Code__c':$scope.QuoteRecords.Opportunity.Account.BillingPostalCode};
+                                    var invoiceLineItem={'Quantity__c':$scope.QuoteLineValues[i].input[j.toString()].Quantity__c,'Amount__c':$scope.QuoteLineValues[i].input[j.toString()].Quantity__c * $scope.QuoteLineValues[i].UnitPrice,'Product__c':$scope.QuoteLineValues[i].Product2Id,'Unit_Price__c':$scope.QuoteLineValues[i].UnitPrice,'Description__c':$scope.QuoteLineValues[i].Quote_PDF_Description__c,'Quote_Line_Item__c':$scope.QuoteLineValues[i].Id};
+                                    invoiceRecord.AllLineItems=[];
+                                    invoiceRecord.AllLineItems.push(invoiceLineItem);
+                                    allInvoicesarray.push(invoiceRecord);
+                                }
+                                console.log('allInvoicesarray');
+                                console.log(allInvoicesarray);
+                            }else{
+                                for(var i=1;i<=$scope.QuoteLineValues.length-1;i++){
+                                    for(var j=0; j< allInvoicesarray.length;j++){
+                                        var invoiceRecord={};
+                                        //invoiceRecord.Quote__c = $scope.quoteId;
+                                        invoiceRecord.InvoiceItem={'Quote__c':$scope.quoteId,'Date__c':$scope.datenowFormat,'Subscription_Start_Date__c':$scope.subsStartDate,'Subscription_Month__c':$scope.subsMonth,'Payment_Terms__c':$scope.selectedPayTerms,'P_O_Number__c':$scope.poNumber,'Contact__c':$scope.QuoteRecords.Opportunity.Teacher__c,'Due_Date__c':$scope.dueDate,'No_of_Years__c':$scope.QuoteRecords.No_Years__c,'Account_of_Contact__c':$scope.QuoteRecords.Opportunity.AccountId,'Billing_Country__c':$scope.QuoteRecords.Opportunity.Account.BillingCountry,'Billing_City__c':$scope.QuoteRecords.Opportunity.Account.BillingCity,'Billing_State_Province__c':$scope.QuoteRecords.Opportunity.Account.BillingState,'Billing_Street__c':$scope.QuoteRecords.Opportunity.Account.BillingStreet,'Billing_Zip_Postal_Code__c':$scope.QuoteRecords.Opportunity.Account.BillingPostalCode};
+                                        var invoiceLineItem={'Quantity__c':$scope.QuoteLineValues[i].input[j.toString()].Quantity__c,'Amount__c':$scope.QuoteLineValues[i].input[j.toString()].Quantity__c * $scope.QuoteLineValues[i].UnitPrice,'Product__c':$scope.QuoteLineValues[i].Product2Id,'Unit_Price__c':$scope.QuoteLineValues[i].UnitPrice,'Description__c':$scope.QuoteLineValues[i].Quote_PDF_Description__c,'Quote_Line_Item__c':$scope.QuoteLineValues[i].Id};
+                                        allInvoicesarray[j].AllLineItems.push(invoiceLineItem);
+                                        console.log(allInvoicesarray);
+                                    }
+                                }
+                            }
+                        }
+                    }else{
+                        debugger;
+                        console.log('inside the else');
+                        console.log($scope.QuoteLineValues);
+                        console.log(allInvoicesarray);
+                        var invoiceRecord ={};
+                        invoiceRecord.AllLineItems=[];
+                        //invoiceRecord.Quote__c = $scope.quoteId;
+                        //subsStartDate,subsMonth,datenow,paymentTerms
+  // invoiceRecord.InvoiceItem={'Quote__c':$scope.quoteId,'Date__c':$scope.datenowFormat,'Subscription_Start_Date__c':$scope.subsStartDate,'Subscription_Month__c':$scope.subsMonth,'Payment_Terms__c':$scope.selectedPayTerms,'P_O_Number__c':$scope.poNumber,'Contact__c':$scope.QuoteRecords.Opportunity.Teacher__c,'Due_Date__c':$scope.dueDate,'No_of_Years__c':$scope.QuoteRecords.No_Years__c,'Account_of_Contact__c':$scope.QuoteRecords.Opportunity.AccountId,'Billing_Country__c':$scope.QuoteRecords.opportunity.Account.Billingcountry,'Billing_City__c':$scope.QuoteRecords.opportunity.Account.BillingCity,'Billing_State_Province__c':$scope.QuoteRecords.opportunity.Account.BillingState,'Billing_Street__c':$scope.QuoteRecords.opportunity.Account.BillingStreet,'Billing_Zip_Postal_Code__c':$scope.QuoteRecords.opportunity.Account.BillingPostalCode};
+                        invoiceRecord.InvoiceItem={'Quote__c':$scope.quoteId,'Date__c':$scope.datenowFormat,'Subscription_Start_Date__c':$scope.subsStartDate,'Subscription_Month__c':$scope.subsMonth,'Payment_Terms__c':$scope.selectedPayTerms,'P_O_Number__c':$scope.poNumber,'Contact__c':$scope.QuoteRecords.Opportunity.Teacher__c,'Due_Date__c':$scope.dueDate,'No_of_Years__c':$scope.QuoteRecords.No_Years__c,'Account_of_Contact__c':$scope.QuoteRecords.Opportunity.AccountId,'Billing_Country__c':$scope.QuoteRecords.Opportunity.Account.BillingCountry,'Billing_City__c':$scope.QuoteRecords.Opportunity.Account.BillingCity,'Billing_State_Province__c':$scope.QuoteRecords.Opportunity.Account.BillingState,'Billing_Street__c':$scope.QuoteRecords.Opportunity.Account.BillingStreet,'Billing_Zip_Postal_Code__c':$scope.QuoteRecords.Opportunity.Account.BillingPostalCode};
+                        for(var i=0;i<$scope.QuoteLineValues.length;i++){
+                            console.log($scope.QuoteLineValues[i].Quantity);
+                            
+                            /*   var invoiceLineItem={'Quantity__c':$scope.QuoteLineValues[i].Quantity,'Amount__c':$scope.QuoteLineValues[i].Quantity * $scope.QuoteLineValues[i].UnitPrice,'Product__c':$scope.QuoteLineValues[i].Product2Id,'Unit_Price__c':$scope.QuoteLineValues[i].UnitPrice,'Description__c':$scope.QuoteLineValues[i].Quote_PDF_Description__c,'Total_Amount__c':$scope.QuoteRecords.No_Years__c * $scope.QuoteLineValues[i].UnitPrice * $scope.QuoteLineValues[i].Quantity}; */
+                            var invoiceLineItem={'Quantity__c':$scope.QuoteLineValues[i].Quantity,'Amount__c':$scope.QuoteLineValues[i].Quantity * $scope.QuoteLineValues[i].UnitPrice,'Product__c':$scope.QuoteLineValues[i].Product2Id,'Unit_Price__c':$scope.QuoteLineValues[i].UnitPrice,'Description__c':$scope.QuoteLineValues[i].Quote_PDF_Description__c,'Quote_Line_Item__c':$scope.QuoteLineValues[i].Id};
+                            invoiceRecord.AllLineItems.push(invoiceLineItem);
+                        }
+                        allInvoicesarray.push(invoiceRecord);
+                        console.log(allInvoicesarray);
+                    } console.log('$scope.quoteId'+$scope.quoteId);
+                    //SplitSchoolDetailsController_v1.createAllInvoices(allInvoicesarray);
+                    SplitSchoolDetailsController_v1.createAllInvoices(JSON.stringify(allInvoicesarray),$scope.Split, function(resp,event){
+                        console.log('its in the createinvoice method');
+                        console.log('$scope.quoteId'+$scope.quoteId);
+                        console.log(resp);
+                        if(resp != null || resp != undefined) {
+                            if(resp[0].Id != null) {
+                                //window.top.location = '/'+$scope.quoteId;
+                                window.top.location='/'+resp[0].Id;
+                                console.log('Record Updated Successfuly');
+                            } else {
+                                $scope.loadbol=false;
+                                alert(resp);
+                                window.top.location = '/'+$scope.quoteId;
+                            }
+                        }
+                    }); 
+                    
+                }
+                $scope.AllSubTotal=0;
+                $scope.AllInvoiceTotal=0;
+                $scope.checkProgressBar=function(){
+                    
+                    $scope.AllSubTotal=0;
+                    $scope.AllInvoiceTotal=0;
+                    for(var i=0;i<$scope.QuoteLineValues.length;i++){
+                        var x=0;
+                        for(var j=0;j< $scope.splitNumber;j++){
+                            if($scope.QuoteLineValues[i].input != undefined && $scope.QuoteLineValues[i].input[j.toString()] != undefined && $scope.QuoteLineValues[i].input[j.toString()].Quantity__c != undefined){
+                                x+=$scope.QuoteLineValues[i].input[j.toString()].Quantity__c * $scope.QuoteLineValues[i].UnitPrice;
+                                
+                            }
+                            
+                        }
+                        $scope.AllInvoiceTotal +=x;
+                        $scope.AllSubTotal +=$scope.QuoteLineValues[i].Subtotal;
+                        $scope.QuoteLineValues[i].TotalAmountValues=x;
+                        //Added
+                        console.log('the console before if');
+                        if($scope.QuoteLineValues[i].TotalAmountValues <= $scope.QuoteLineValues[i].Subtotal ){
+                            console.log('entered the if ##');
+                            $scope.QuoteLineValues[i].selectedAmountProgress = $scope.QuoteLineValues[i].TotalAmountValues/$scope.QuoteLineValues[i].Subtotal * 100;
+                            //  $scope.Disablesave = false;
+                        }
+                        else{
+                            //alert('Splited number of students are greater than Total Number of Students');
+                            //$scope.Disablesave = true;
+                        }
+                        
+                    }
+                    if($scope.AllSubTotal == $scope.AllInvoiceTotal)
+                        $scope.Disablesave = true;
+                    else
+                        $scope.Disablesave = false;
+                    
+                }
+                $scope.checkProgressBar();
+                
+            });
+            </script>
+            <style>
+                
+                .custom-checkbox .custom-control-input:checked~.custom-control-label::after {
+                background-image: url(data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' v…M6.564.75l-3.59 3.612-1.538-1.55L0 4.26 2.974 7.25 8 2.193z'/%3E%3C/svg%3E);
+                }
+                .custom-control-label::after {
+                position: absolute;
+                top: .25rem;
+                left: 0;
+                display: block;
+                width: 1rem;
+                height: 1rem;
+                content: "";
+                background-repeat: no-repeat;
+                background-position: center center;
+                background-size: 50% 50%;
+                }
+                md-checkbox {
+                margin: 8px;
+                cursor: pointer;
+                padding-left: 18px;
+                padding-right: 0;
+                line-height: 26px;
+                min-width: 18px;
+                min-height: 18px;
+                }
+                md-checkbox.md-checked[disabled].red .md-icon {
+                background-color: rgba(255, 0, 0, 0.26);
+                }
+                .red {
+                color: red;
+                }
+                
+                .green {
+                color: green;
+                }
+                
+                
+                #leftcolumn {
+                width: 50%;
+                
+                background-color:white;
+                position: absolute;
+                }
+                #rightcolumn {
+                width: 50%;
+                background-color:white;
+                float: right;
+                }
+                .blockwindow{
+                width:100%;
+                height:100%;
+                top:0;
+                left:0;
+                position:fixed;
+                background-color:rgba(0,0,0,.3);
+                
+                }
+                #displayLoading{
+                top:50%;
+                left:47%;
+                position:absolute;
+                }
+                
+            </style>
+        </head>
+        <body class="container" ng-controller="DemoCtrl" > <!-- ng-init="checkProgressBar()" -->
+            <div id="div1" style="width:100%;">
+               
+                <br/><br/>
+                <div id="div4" ng-show="hideExtraFields" style="width:100%">
+                    <div id="" style="width:100%;">
+                        <table width="100%">
+                            <tr> 
+                               <!-- <td>
+                                    <label>Invoice Number</label>&nbsp;
+                                </td>
+                                <td><input class="form-control" style="width:80%;" type="text"  id="InvNum" ng-model="InvNumber" ng-disabled="disableInvNumber" /></td> -->
+                                <td>
+                                    <label>Invoice Date</label>&nbsp; 
+                                    <!--    <label>Date</label>&nbsp;<input style="width:40%;" type="text" name="event_start_date" id="event_start_date" placeholder="Enter Date" ng-model="datenow"/> &nbsp; -->
+                                </td>
+                                <td><input class="form-control"  ui-date="opts" style="width:80%;"   placeholder="mm/dd/yyyy" ng-model="datenow" ng-change="changeDueDate(selectedPayTerms)"/></td>
+                                
+                                <td>
+                                    <label>Order Number</label>&nbsp;
+                                </td>
+                                <td><input class="form-control" style="width:80%;" type="text"  id="poNum" ng-model="poNumber" /></td>
+                            </tr>
+                            <tr style="width:100%;"><td>&nbsp; </td><td> &nbsp;</td><td>&nbsp; </td><td> &nbsp;</td></tr>
+                            <tr style="width:100%;">
+                              <!--  <td>
+                                    <label>Invoice Date</label>&nbsp; 
+                                </td>
+                                <td><input class="form-control"  ui-date="opts" style="width:80%;"   placeholder="mm/dd/yyyy" ng-model="datenow" ng-change="changeDueDate(selectedPayTerms)"/></td> -->
+                                <td>
+                                    <label>Terms</label>&nbsp;
+                                    <!--    <label>Payment Terms</label>&nbsp;<select style="width:40%;" type="text"  name="payTerms" id="payTerms" ng-model="paymentTerms"></select> -->
+                                </td>
+                                <td>
+                                    <select class="form-control"  style="width:80%;" ng-model="selectedPayTerms" ng-change="changeDueDate(selectedPayTerms)" >
+                                        <!--<option  ng-selected="true">--NONE--</option> -->
+                                        <!--   <option  ng-selected="true">Net-30</option> -->
+                                        <option ng-repeat="x in payTerms" value="{{x}}" >{{x}}</option> <!-- ng-selected="{{x[1]}}" -->
+                                    </select>
+                                </td>
+                                <td><label>Due Date</label>&nbsp; </td>
+                                <td><!--<input class="form-control" ui-date="opts" style="width:80%;"  placeholder="mm/dd/yyyy" ng-model="dueDate" /> -->
+                                    <input style="width:80%;" ng-disabled="disableDueDate" type="text" name="duedateName" id="duedateName" placeholder="mm/dd/yyyy" ng-model="dueDate"/> &nbsp;
+                                </td>
+                            </tr>
+                            <tr style="width:100%;"><td>&nbsp; </td><td> &nbsp;</td><td>&nbsp; </td><td> &nbsp;</td></tr>
+                         <!--   <tr style="width:100%;"><td>&nbsp; </td><td> &nbsp;</td>
+                                <td><label>Due Date</label>&nbsp; </td>
+                                <td>
+                                    <input style="width:80%;" ng-disabled="disableDueDate" type="text" name="duedateName" id="duedateName" placeholder="mm/dd/yyyy" ng-model="dueDate"/> &nbsp;
+                                </td>
+                            </tr>
+                            <tr style="width:100%;"><td>&nbsp; </td><td> &nbsp;</td><td>&nbsp; </td><td> &nbsp;</td></tr> -->
+                            <tr style="width:100%;">
+                                <td>
+                                    <label>Subscription Start Date</label>&nbsp;
+                                </td>
+                                <td><input class="form-control" ui-date="opts" style="width:80%;"  placeholder="mm/dd/yyyy" ng-model="subsStartDate" ng-change="changeDuration(subsStartDate)" />
+                                </td>
+                                <td>
+                                    <label>Subscription Duration</label>&nbsp;
+                                </td>
+                                <td><input class="form-control" style="width:80%;" type="number"  id="monthsNum" ng-model="subsMonth"/></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <br/><br/>
+                
+                <div id="div3" style="width:100%;">
+                    <form class="form-inline" role="form">
+                        <table class="table ">
+                            <tr>
+                                <th style="width:5%;"></th>    
+                                <th style="width:20%;">Product Name</th>
+                                <th style="width:45%;">Description</th>
+                                <th style="width:5%;">Quantity</th>
+                                <th style="width:5%;">Subtotal</th>
+                                <th style="width:40%;">Invoiced</th>
+                            </tr>
+                            
+                            <tr ng-repeat="qLI in QuoteLineValues | filter:query">
+                                <td><span class="glyphicon glyphicon-pushpin greyColor"></span></td>
+                                <td>{{qLI.Item__c}}</td>
+                                <td>
+                                    <apex:outputText escape="false" value="{{qLI.Quote_PDF_Description__c}}"></apex:outputText>
+                                </td> <!-- {{qLI.Quote_PDF_Description__c}} -->
+                                <td>
+                                    <span class="form-group has-success has-feedback">
+                                        {{qLI.Quantity}}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="form-group has-success has-feedback">
+                                        {{qLI.Subtotal}}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="{{qLI.TotalAmountValues}}" aria-valuemin="0" aria-valuemax="qLI.Subtotal" style="width:{{qLI.selectedAmountProgress}}%">{{qLI.TotalAmountValues}}</span>
+                                    <!-- {{qLI.TotalAmountValues}} -->
+                                </td>
+                            </tr>
+                        </table>
+                        
+                    </form>
+                </div>
+                <br/>
+                
+              <!--  <div id="" style="width:100%">
+                    <button type="button" ng-show="showCreate" class="btn btn-primary" ng-click="saveInvoicerecords()">Create</button>
+                </div> -->
+                
+                <div id="" style="width:100%">
+                    <table>
+                        <tr>
+                            <td><label ng-show="showInput">Split Invoice:</label></td>
+                            <td><input class="form-control" style="width:80%" ng-model="splitNumber" type="number" ng-change="isSplit(splitNumber)" /></td>
+                            <td>&nbsp;</td>
+                            <td> <button type="button" ng-show="showSplit" class="btn btn-primary" ng-click="callFuncSplit(splitNumber)">Split</button></td>
+                        </tr>
+                    </table>
+                    <br/><br/>
+                    <!-- <button type="button" ng-show="showSplit" class="btn btn-primary" ng-click="callFuncSplit(splitNumber)">Split</button>
+<br/><br/> -->
+                </div>
+                
+                <div id="" style="width:100%">
+                    <button type="button" ng-show="showCreate" class="btn btn-primary" ng-click="saveInvoicerecords()">Create</button>
+                </div>
+                
+                <div id="splitTable" style="width:100%">
+                    <form class="form-inline" role="form">
+                        <table class="table" ng-show="showTableToSplit">
+                            <thead> 
+                                <tr></tr>
+                                <tr>
+                                    <th ng-repeat="column in divs">{{column}}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="qLI in QuoteLineValues">
+                                    <td><span class="glyphicon glyphicon-pushpin greyColor"></span></td>
+                                    <td>{{qLI.Item__c}}</td>
+                                    <td>
+                                        <span class="form-group has-success has-feedback">
+                                            {{qLI.Quantity}}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="form-group has-success has-feedback">
+                                            {{qLI.UnitPrice}}
+                                        </span>
+                                    </td>
+                                    <td ng-repeat="input in inputsBox track by $index"  ng-value="{{$index}}">
+                                        <span class="form-group has-success has-feedback" >
+                                            <input type="number" style="width:120px;" class="form-control " id="box-input" min="0" ng-model="qLI.input[$index].Quantity__c"  ng-change= "checkProgressBar()"/>
+                                            <span class="glyphicon glyphicon-pencil form-control-feedback"></span>
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>  
+                    </form>
+                </div>
+                <div id="" style="width:100%">
+                    <button type="button"  class="btn btn-primary"  ng-click="saveInvoicerecords()" ng-show="Disablesave">Save</button> <!-- ng-show="Disablesave" -->
+                </div>
+            </div>
+            <div class="blockwindow" ng-show="loadbol"></div>
+            <div id="displayLoading" ng-show="loadbol">
+                <i style="color:black;font-size:50px;" class="fa fa-spinner fa-spin" ></i>
+            </div>
+        </body>
+    </html>
+</apex:page>

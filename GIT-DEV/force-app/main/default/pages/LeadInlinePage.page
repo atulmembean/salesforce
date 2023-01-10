@@ -1,0 +1,169 @@
+<apex:page StandardController="Lead" Extensions="LeadInlinePageController" showHeader="false" sidebar="false" applyHtmlTag="false" applyBodyTag="false">
+  
+    <apex:form >
+        <apex:outputText value="Please attach the lead to a school account to see the Membean presence in the area" rendered="{!IF(ISNULL(Lead.School_Account__c) , true , false)}">
+        <br/>
+        </apex:outputText>
+        <apex:outputText value="The lead record seem to have incomplete address. Please check the address of the school this lead is attached to"
+                         rendered="{!IF(ISNULL(Lead.School_Account__r.GeocodeLatitude__Latitude__s) && ISNULL(Lead.School_Account__r.GeocodeLatitude__Longitude__s) && ISNULL(Lead.School_Account__c) == false , true , false)}"/>
+       
+        <apex:pageBlock id="AccountInfo" rendered="{!Lead.School_Account__r.RecordType.DeveloperName =='Public_School'}" >
+            <table>
+                <tr>
+                    <td>
+                        <div style="float:left;width:100%;">
+                            <section id="content" style=""> <!--padding-left:25px;-->
+                                <table style="border: solid 1px #ccc;width:100%;"> 
+                                    <th  colspan="" style="font-size:15px;background-color: #D7DBDD;text-align:center;">Total schools in the district</th>
+                                    <tbody>
+                                        <tr><td style="font-size:15px;text-align: Center;">{!countTotalNumberOfSchool}</td></tr>    
+                                    </tbody>
+                                </table>
+                            </section> 
+                        </div>&nbsp;&nbsp;&nbsp;&nbsp; <br/>
+                    </td>
+                    <td>
+                        <div style="float:left;width:100%;">
+                            <section id="content" style=""> 
+                                <table style="border: solid 1px #ccc;width:100%;"> 
+                                    <th  colspan="" style="font-size:15px;background-color: #D7DBDD;text-align:center;">Customers in district</th>
+                                    <tbody>
+                                        <tr><td style="font-size:15px;text-align: Center;">{!countTotalNumberOfCustomer}</td></tr>    
+                                    </tbody>
+                                </table>
+                            </section> 
+                        </div>&nbsp;&nbsp;&nbsp;&nbsp; <br/>
+                    </td>
+                    <td>
+                        <div style="float:left;width:100%;">
+                            <section id="content" style=""> 
+                                <table style="border: solid 1px #ccc;width:100%;"> 
+                                    <th  colspan="" style="font-size:15px;background-color: #D7DBDD;text-align:center;">Pilots in district</th>
+                                    <tbody>
+                                        <tr><td style="font-size:15px;text-align: Center;">{!countTotalNumberOfPilots}</td></tr>    
+                                    </tbody>
+                                </table>
+                            </section> 
+                        </div>&nbsp;&nbsp;&nbsp;&nbsp; <br/>
+                    </td>
+                </tr> <br/>
+            </table> 
+            <big style="color:#099AD6;">
+                Total Customers:
+            </big>
+            <apex:outputText value="{!totalCountCustomer}"/>
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
+            <big style="color:#099AD6;">
+                Total Pilots:
+            </big>
+            <apex:outputText value="{!totalCountPilot}"/>
+            &nbsp;   &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;          
+            <big style="color:#099AD6;">
+                Search By Miles: 
+            </big>
+            <apex:inputText value="{!radius}" style="" />
+            &nbsp;   &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;   &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+            <apex:commandButton value="Go" action="{!getschoolDetails}" reRender="AccountInfo" style="width:100px;border-radius: 12px;background:#099AD6;"  status="counterStatus" />
+            <apex:actionStatus id="counterStatus">
+                <apex:facet name="start">
+                    <center>
+                        <img src="/img/loading32.gif" />
+                    </center>
+                </apex:facet>
+            </apex:actionStatus>
+        </apex:pageBlock>
+            <br/>
+            <apex:pageBlock id="AccountInfo2" rendered="{!Lead.School_Account__r.RecordType.DeveloperName =='Private_School'}" >
+                <big style="color:#099AD6;">
+                    Total Customers:
+                </big>
+                <apex:outputText value="{!totalCountCustomer}"/>
+                &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
+                <big style="color:#099AD6;">
+                    Total Pilots:
+                </big>
+                <apex:outputText value="{!totalCountPilot}"/>
+                &nbsp;   &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;          
+                <big style="color:#099AD6;">
+                    Search By Miles: 
+                </big>
+                <apex:inputText value="{!radius}" style="" />
+                &nbsp;   &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;   &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                <apex:commandButton value="Go" action="{!getschoolDetails}" reRender="AccountInfo2" style="width:100px;border-radius: 12px;background:#099AD6;"  status="counterStatus" />
+                <apex:actionStatus id="counterStatus">
+                    <apex:facet name="start">
+                        <center>
+                            <img src="/img/loading32.gif" />
+                        </center>
+                    </apex:facet>
+                </apex:actionStatus>
+            </apex:pageBlock>
+        	<br/>
+        <apex:pageBlock id="AccountInfo3" rendered="{!Lead.School_Account__r.RecordType.DeveloperName =='District'}" >
+            <table>
+                <tr>
+                    <td>
+                        <div style="float:left;width:100%;">
+                            <section id="content" style=""> <!--padding-left:25px;-->
+                                <table style="border: solid 1px #ccc;width:100%;"> 
+                                    <th  colspan="" style="font-size:15px;background-color: #D7DBDD;text-align:center;">Total schools in the district</th>
+                                    <tbody>
+                                        <tr><td style="font-size:15px;text-align: Center;">{!countTotalNumberOfSchool}</td></tr>    
+                                    </tbody>
+                                </table>
+                            </section> 
+                        </div>&nbsp;&nbsp;&nbsp;&nbsp; <br/>
+                    </td>
+                    <td>
+                        <div style="float:left;width:100%;">
+                            <section id="content" style=""> 
+                                <table style="border: solid 1px #ccc;width:100%;"> 
+                                    <th  colspan="" style="font-size:15px;background-color: #D7DBDD;text-align:center;">Customers in district</th>
+                                    <tbody>
+                                        <tr><td style="font-size:15px;text-align: Center;">{!countTotalNumberOfCustomer}</td></tr>    
+                                    </tbody>
+                                </table>
+                            </section> 
+                        </div>&nbsp;&nbsp;&nbsp;&nbsp; <br/>
+                    </td>
+                    <td>
+                        <div style="float:left;width:100%;">
+                            <section id="content" style=""> 
+                                <table style="border: solid 1px #ccc;width:100%;"> 
+                                    <th  colspan="" style="font-size:15px;background-color: #D7DBDD;text-align:center;">Pilots in district</th>
+                                    <tbody>
+                                        <tr><td style="font-size:15px;text-align: Center;">{!countTotalNumberOfPilots}</td></tr>    
+                                    </tbody>
+                                </table>
+                            </section> 
+                        </div>&nbsp;&nbsp;&nbsp;&nbsp; <br/>
+                    </td>
+                </tr> <br/>
+            </table> 
+            <big style="color:#099AD6;">
+                Total Customers:
+            </big>
+            <apex:outputText value="{!totalCountCustomer}"/>
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
+            <big style="color:#099AD6;">
+                Total Pilots:
+            </big>
+            <apex:outputText value="{!totalCountPilot}"/>
+            &nbsp;   &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;          
+            <big style="color:#099AD6;">
+                Search By Miles: 
+            </big>
+            <apex:inputText value="{!radius}" style="" />
+            &nbsp;   &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;   &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+            <apex:commandButton value="Go" action="{!getschoolDetails}" reRender="AccountInfo3" style="width:100px;border-radius: 12px;background:#099AD6;"  status="counterStatus" />
+            <apex:actionStatus id="counterStatus">
+                <apex:facet name="start">
+                    <center>
+                        <img src="/img/loading32.gif" />
+                    </center>
+                </apex:facet>
+            </apex:actionStatus>
+        </apex:pageBlock>
+
+    </apex:form>
+</apex:page>

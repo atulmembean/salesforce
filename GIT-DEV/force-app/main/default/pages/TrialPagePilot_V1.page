@@ -1,0 +1,289 @@
+<apex:page Controller="MembeanDashboardForPilots" showHeader="false" sidebar="false" applyHtmlTag="false" applyBodyTag="false">
+    
+    <html>
+        <head>
+            <style>
+                 body {
+                background-color: white;
+                margin: 0;
+                }
+                                               
+                #wrapper {
+                width: 1005px;
+                margin: 0 auto;
+                position: relative;
+                background-color: red;
+                }
+                #leftcolumn, #rightcolumn {
+                border: 1px solid white;
+                min-height: 750px;
+                color: black;
+                }
+                #leftcolumn {
+                width: 65%;
+                /* background-color: #ccff99; */
+                /*min-height: 100px;*/
+                background-color:white;
+                position: absolute;
+                }
+                #leftcolumn1 {
+                width: 50%;
+                /* background-color: #ccff99; */
+                /*min-height: 100px;*/
+                background-color:white;
+                /* position: absolute;*/
+               
+                }
+                #leftcolumn2 {
+                width: 50%;
+                /* background-color: #ccff99; */
+                /*min-height: 100px;*/
+                background-color:white;
+                /* position: absolute;*/
+                /*  float: right;*/
+                padding-right:10px;
+                }
+                #rightcolumn {
+                width: 35%;
+                background-color:white;
+                float: right;
+                }
+                #subSection1 {
+                column-count: 1;
+                /* column-gap: 20px;*/
+               height: 400px;
+                background-color:white;
+                }
+                #subSection2 {
+                column-count: 1;
+                /* height: 550px;*/
+                background-color:white;
+                }
+                #downLeftColumn1 {
+                width: 40%;
+                /* background-color: #ccff99; */
+                /*min-height: 100px;*/
+                background-color:white;
+                 position: absolute;
+               
+                }
+                #downLeftColumn2 {
+                width: 60%;
+                /* background-color: #ccff99; */
+                /*min-height: 100px;*/
+                background-color:white;
+                /* position: right*/
+               float:right;
+                /* padding-top:300px;*/
+                }
+                .analyticsCordaChart {
+                width: 302px!important;
+                float: left;
+                margin-left: 18px;
+                matgin-right:12px;
+                }
+                #chartimage {
+                width: 424px!important;
+                }
+                table {
+                /*border-collapse: collapse; */
+                width: 100%;
+                }
+                
+                th, td {
+              /*  text-align: Center; 
+                padding: 8px; */
+                }
+                
+                /* tr:nth-child(even){background-color:#A6E5E3;}  */
+                /* td:nth-child(even){background-color:#A6E5E3;} */ 
+                /*td:nth-child(odd){background-color:#A6E5E3;} */
+                /************************************************************************************
+                MEDIA QUERIES
+                *************************************************************************************/
+                /* for 980px or less */
+                @media screen and (max-width: 980px) {
+                
+                #pagewrap {
+                //width: 94%;
+                width: inherit;
+                }
+                #content {
+                width: 41%;
+                padding: 1% 4%;
+                }
+                #middle {
+                width: 41%;
+                padding: 1% 4%;
+                margin: 0px 0px 5px 5px;
+                float: right;
+                }
+                
+                #sidebar {
+                clear: both;
+                padding: 1% 4%;
+                width: auto;
+                float: none;
+                }
+                
+                header, footer {
+                padding: 1% 4%;
+                }
+                }
+                
+                /* for 700px or less */
+                @media screen and (max-width: 600px) {
+                
+                #content {
+                width: auto;
+                float: none;
+                }
+                
+                #middle {
+                width: auto;
+                float: none;
+                margin-left: 0px;
+                /*  background:#ccff99;*/   
+                }
+                
+                #sidebar {
+                width: auto;
+                float: none;
+                }
+                
+                }
+                
+                /* for 480px or less */
+                @media screen and (max-width: 480px) {
+                
+                header {
+                height: auto;
+                }
+                h1 {
+                font-size: 2em;
+                }
+                #sidebar {
+                display: none;
+                }
+                
+                }
+                
+            </style>
+            <script>
+            function myFunction() {
+                document.getElementsByClassName('refreshButton')[0].click();
+                //var el = document.getElementsByClassName('node closed');
+                location.reload();
+                //setTimeout(function(){ myFunction(); }, 3000);
+            }
+            setTimeout(function(){ myFunction(); }, 600000);
+            </script>
+        </head>
+        <body>
+             
+            <Center><h1><Big><B  style="font-size:50px">Dashboard for Pilots</B></Big></h1></Center> <br/><br/> 
+            <div id="pagewrap">
+               <div id="leftcolumn">
+                   <div id="subSection1">
+                        <TABLE >
+                            <TD>
+                                <TABLE style="border-spacing:3em;">
+                                <TR>
+                                   <TD style="width:20%;">
+                                        <table style="border: solid 1px #ccc;width:100%"> 
+                                            <th   style="font-size:25px;background-color: #D7DBDD;text-align:center;">Total Active Pilots </th>
+                                            <tbody>
+                                                <tr><td style="font-size:50px;text-align: Center;">{!countTotalActivePilots}</td></tr>    
+                                            </tbody>
+                                        </table>
+                                   </TD>
+                                   <TD style="width:20%;">
+                                        <table style="border: solid 1px #ccc;width:100%"> 
+                                            <th   style="font-size:25px;background-color: #D7DBDD;text-align:center;">Total Converted Pilots </th>
+                                            <tbody>
+                                                <tr><td style="font-size:50px;text-align: Center;">{!countTotalConvertedPilots}</td></tr>    
+                                            </tbody>
+                                        </table>
+                                   </TD> </TR>
+                                   <TR>
+                                   <TD style="width:20%;">
+                                        <table style="border: solid 1px #ccc;width:100%"> 
+                                            <th   style="font-size:25px;background-color: #D7DBDD;text-align:center;">Total Expired Pilots </th>
+                                            <tbody>
+                                                <tr><td style="font-size:50px;text-align: Center;">{!countTotalExpiredPilots}</td></tr>    
+                                            </tbody>
+                                        </table>
+                                   </TD>
+                                   <TD style="width:20%;">
+                                        <table style="border: solid 1px #ccc;width:100%"> 
+                                            <th   style="font-size:25px;background-color: #D7DBDD;text-align:center;">Total Lost Pilots </th>
+                                            <tbody>
+                                                <tr><td style="font-size:50px;text-align: Center;">{!countTotalLostPilots}</td></tr>    
+                                            </tbody>
+                                        </table>
+                                   </TD>
+                                   </TR>
+                                </TABLE>
+                            </TD>
+                        </table>
+                   </div>
+                   <div id="subSection2">
+                      <div id="downLeftColumn1">
+                         <div style="float:left;width:100%;">
+                            <b><Span style="font-size:50px;padding-left:150px;">{!countPilotsThisWeek}</span></b>
+                            <section id="content" style="padding-left:5px;"> <!-- padding-left:10px; -->
+                                <table style="border: solid 1px #CCC;"> 
+                                    <thead > <th  colspan="2" align="center" style="font-size:25px;text-align: Center;">Pilots this Week</th>
+                                        <tr style="font-weight:bold;">
+                                            <th style="background-color: #D7DBDD;font-size:15px;text-align: Center;">School Name</th>  
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <apex:repeat value="{!pilotsThisWeek}" var="op">
+                                            <tr>
+                                                <td style="height:20;font-size:20px; text-align: left;padding-top:4px;">{!op.Account.Name}</td>   
+                                            </tr>    
+                                        </apex:repeat>
+                                    </tbody>
+                                </table>
+                            </section> 
+                        </div> 
+                      </div>                      
+                        <div id="downLeftColumn2" style="padding-left:5px;">
+                            <b><Span style="font-size:50px;padding-left:250px;">{!countPilotsExpiringThisWeek}</span></b>
+                             <section id="" style="width:100%;padding-left:5px;">
+                                <table style="border: solid 1px #ccc;width:100%;">
+                                    <thead > <th  colspan="3" align="center" style="font-size:25px;text-align: Center;">Expiring this Week</th>
+                                        <tr>
+                                            <th style="background-color: #D7DBDD;font-size:15px;text-align: Center;">School Name</th>
+                                            <th style="background-color: #D7DBDD;font-size:15px;text-align: Center;">Users</th>
+                                            <th style="background-color: #D7DBDD;font-size:15px;text-align: Center;">Estimate</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <apex:repeat value="{!pilotsExpiringThisWeek}" var="op">
+                                            <tr>
+                                                <td style="height:20;font-size:20px; text-align: left;padding-top:4px;">{!op.Account.Name}</td>
+                                                <td style="height:20;font-size:20px; text-align: center;padding-top:4px;">{!op.Account.Membean_Student_Count__c}</td>
+                                                <td  style="height:20;font-size:20px; text-align: center;padding-top:4px;background-color:{!IF((op.Estimate_Status__c =='Estimated'),'#29F914','#FC3A0A')}" >
+                                                    {!IF((op.Estimate_Status__c == 'Estimated'),'YES','NO')}
+                                                  <!-- {!op.Estimate_Status__c } -->
+                                               </td> 
+                                            </tr>    
+                                        </apex:repeat>
+                                    </tbody>
+                                </table>
+                            </section>
+                        </div>   
+                 
+                   </div>
+               </div> 
+               <div id="rightcolumn">
+                    <div style="width:50px;!important;padding-left:10px;">
+                        <analytics:reportChart size="large" reportId="00O36000007AwbS"></analytics:reportChart>
+                    </div>
+               </div>
+            </div>
+        </body>
+    </html>
+</apex:page>

@@ -1,0 +1,13 @@
+<aura:component controller="SplitSchoolDetailsController_v1" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+	<aura:attribute type="String" name="recordId" default="" />
+    <aura:attribute name="quoteList" type="Quote" /> <!-- Attribute - All Quote related Information-->
+    
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    Create Split School Records?
+    <br/><br/>
+    <div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_offline" role="alert">
+        <span class="slds-assistive-text">error</span>
+        
+        <lightning:button variant="brand" label="Create" onclick="{!c.handleClick}"/>
+    </div>
+</aura:component>

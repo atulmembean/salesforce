@@ -1,0 +1,697 @@
+<apex:page standardStylesheets="false" sidebar="false"  showHeader="false" controller="Registration_Clr">
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+    <title>Teacher Registration</title>
+    <style>
+        body{ background-color:#FFFFFF;display: flex;
+        align-items: center;
+        justify-content: center;  }
+    </style>
+
+    <!-- Bootstrap core CSS -->
+    <apex:stylesheet value="{!URLFOR($Resource.CustomFiles,'/MemBean/css/bootstrap.min.css' )}" />
+    <apex:stylesheet value="{!URLFOR($Resource.CustomFiles,'/MemBean/css/bootstrap-reset.css' )}" />
+    
+    <!--external css-->
+    <apex:stylesheet value="{!URLFOR($Resource.CustomFiles,'/MemBean/css/font-awesome.css' )}" />
+    
+    <!-- Custom styles for this template -->
+    <apex:stylesheet value="{!URLFOR($Resource.CustomFiles,'/MemBean/css/style.css' )}" />
+    <apex:stylesheet value="{!URLFOR($Resource.CustomFiles,'/MemBean/css/style-responsive.css' )}" />
+    <apex:stylesheet value="{!URLFOR($Resource.CustomFiles,'/MemBean/css/jquery-ui-1.10.4.custom.css' )}" />
+    
+    <apex:stylesheet value="{!URLFOR($Resource.MembeanRegistration, 'NPSStyles.css')}"/>
+        <apex:stylesheet value="{!URLFOR($Resource.MembeanRegistration, 'components.css')}"/>
+        <style type="text/css">
+         html{font-size:18px;}
+        .responsive-mob {
+            width: 410px;
+           margin:0 auto;
+           
+        }
+        .img-align{display:flex;justify-content:center;width:100%;}
+         .centeredimage{width:230px;height:auto;}
+          .centeredimage>img{width:100%;height:auto;}
+          @media (max-width:1400px) and (min-width:1024px){
+          html{font-size:18px;}
+        .responsive-mob {
+            width: 410px;
+            margin-bottom: 80px;
+        }
+        }
+
+        @media (max-width:430px){
+        html{font-size:16px;}
+        .responsive-mob {
+            width: 380px;
+        }
+        .centeredimage{width:150px;}
+        }
+        @media (max-width:360px){
+        .responsive-mob {
+            width: 300px;
+        }
+        }
+        .requiredmsg {
+            content:" *";
+            color: red;
+        }
+         
+        .center-btn{display:flex;justify-content:center;}
+        .form-cancel-btn, .form-submit-btn.buttonStyle {
+            border: 1px solid #afafaf;
+            padding: 9px 15px;
+            cursor: pointer;
+            letter-spacing: 0.5px;
+            font-size: 0.9rem;
+            border-radius: 4px;
+            min-width: 68px;
+            width: auto;
+            font-family: "Poppins Regular";
+            font-weight: 400;
+            text-transform: uppercase;
+        }
+        .form-submit-btn.buttonStyle {
+            background: var(--theme-yellow);
+            border: 1px solid var(--theme-yellow);
+            box-shadow: 0 2px 4px rgb(0 0 0 / 20%);
+        }
+        .form-submit-btn.buttonStyle:hover {
+            background-color: #e3c460;
+        }
+        .myDiv {
+          border: 5px outset red;
+          background-color: gray;
+          text-align: center;
+        }
+        .form-group table{width:100%;}
+        .form-group input{
+        background-color: transparent;
+            color: #3D3A3A;
+            font-size: 0.875rem;
+            border: solid 1px #939191;
+            border-radius:0.25rem;
+            padding: 0.6rem;
+            height:40px;
+            width:100%;
+            
+        }
+        .row-sec{display:flex;justify-content: space-between;}
+        .css-label{font-size:0.875rem;}
+        .chkbox {
+           padding-left: 10px;
+           font-weight: bold;
+         }
+         .relative{position:relative;}
+         .info-icon {display:none}
+         .Asset1Info{padding-right:42px;}
+         .Asset1Info ~ .info-icon {
+         display:block;
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            width: 28px;
+            height: 28px;
+            background: #83744e;
+            padding: 5px;
+            border-radius: 0.25rem;
+        }
+        .Asset1Info ~ .info-icon>img{width:100%;height:100%;}
+    </style>
+
+</head>
+<body onload="init()"/>
+
+    <!-- header part -->
+    <!--main content start-->
+    <div class="mgm-card-main responsive-mob">
+    <div class="centered">
+
+
+                    <div class="img-align text-center">
+                    <div class="centeredimage" style="text-align:center;">
+                    <!--<img src="https://lifelonglearninglab.files.wordpress.com/2014/08/membean-logo.jpg" height="75" width="180"/>-->
+                    <a href="https://membean.com/" target="_blank">
+                    <img src="https://membean--c.na81.content.force.com/servlet/servlet.ImageServer?id=0151Q000005oHzL&oid=00D36000000j7lc&lastMod=1645256541000" height="75" width="180"/>
+                    </a>
+                    </div>
+                    </div>
+                        <div class="mgm-card-bg" id="bg1" style="display:block">
+                        <div class="centered">
+                            <div class="text-centered" style="text-align:center;">
+                                <apex:outputText style="font-size:1.2rem; color: #000000; font-weight: bold; text-align: center" value="MESLC 2022">
+                                </apex:outputText>
+                                <br></br>
+                                <br></br>
+                                <apex:outputText style="font-size:0.8rem; color: #000000; font-weight: bold; text-align: center" value="Enter your details to win:">
+                                </apex:outputText>
+                                <br/>
+                                <apex:outputText style="font-size:0.7rem; color: #000000; font-weight: bold; text-align: left" value="2 Tickets to the Museum of the Future (2 Winners)">
+                                </apex:outputText>
+                                <br/>
+                                <apex:outputText style="font-size:0.7rem; color: #000000; font-weight: bold; text-align: left" value="2 Tickets to Dubai Marina Dinner Cruise (3 Winners)">
+                                </apex:outputText>
+                                <br/>
+                                <apex:outputText style="font-size:0.7rem; color: #000000; font-weight: bold; text-align: left" value="Unlimited pilot for your school until Jun 30, 2022">
+                                </apex:outputText>
+                                <br/>
+                            <br></br>
+                            <br></br>
+                            </div>
+                            
+                                <div class="form-group">
+                                    <label for="fName" id="lblfname" style="font-size:0.8rem;">First Name</label>
+                                    <input type="text" class="form-control" name="Fname" id="fname" onkeyup="fieldscheck();"/>
+                                    <label for="fName" id="div1lblfnamereq" class="requiredmsg" style="font-size:0.8rem;">Required</label>
+                                </div>
+                                <br/>
+                                
+                                <div class="form-group">
+                                    <label for="lName" id="lbllname" style="font-size:0.8rem;">Last Name</label>
+                                    <input type="text" class="form-control" name="Lname" id="lname" onkeyup="fieldscheck();"/>
+                                    <label for="lName" id="div1lbllnamereq" class="requiredmsg" style="font-size:0.8rem;">Required</label>
+                                </div>
+                               <br/>
+                               
+                                <div class="form-group">
+                                    <label for="Email" id="lblemail" style="font-size:0.8rem;">Email</label>
+                                    <input type="email" class="form-control" name="Email" id="Email" placeholder="Email (School Email Preferred)" onkeyup="fieldscheck();"/>
+                                    <label for="Email" id="div1lblemailreq" class="requiredmsg" style="font-size:0.8rem;">Required</label>
+                                </div>
+                                <br/>
+                                
+                                <div class="form-group">
+                                    <label for="phone" id="lblphone" style="font-size:0.8rem;">Phone</label>
+                                    <input type="text" class="form-control" name="Phone" id="Phone"/>
+                                </div>
+                                <br/>
+                                
+                                <div class="form-group">
+                                    <label for="School" id="lblschool" style="font-size:0.8rem;">School</label>
+                                    <input type="text" class="form-control" name="School" id="School" onkeyup="fieldscheck();"/>
+                                    <label for="School" id="div1lblschoolreq" class="requiredmsg" style="font-size:0.8rem;">Required</label>
+                                </div>
+                                <br/>
+
+                                <div class="form-group">
+                                    <label for="City" id="lblcity" style="font-size:0.8rem;">City</label>
+                                    <input type="text" class="form-control" name="City" id="City" onkeyup="fieldscheck();" onblur="getSchoolsByCity(this);"/>
+                                    <label for="City" id="div1lblcityreq" class="requiredmsg" style="font-size:0.8rem;">Required</label>
+                                </div>
+                                <br/>
+                        
+                                <!--<div class="form-group">
+                                    <label for="Country" id="lblcountry" style="font-size:0.8rem;">Country</label>
+                                    <input type="text" class="form-control" name="Country" id="Country" placeholder="Country" value="United Arab Emirates" disabled="disabled"/>
+                                </div>
+                                <br/>-->
+                                
+                                <div class="form-group">
+                                        <label for="Country" id="lblcountry" style="font-size:0.8rem;">Country</label>
+                                        <select class="form-control" name="Country" id="country" style="width:365px;height:45px;line-height:45px;overflow-y:auto;">
+                                        </select>
+                                </div>
+                                <br/>
+       
+                                <div class="form-group">
+                                        <label for="role" id="lblrole" style="font-size:0.8rem;">Role</label>
+                                        <select class="form-control" name="role" id="role" style="width:365px;height:45px;line-height:45px;overflow-y:auto;" onChange="fieldscheck();">
+                                     
+                                        </select>
+                                        <label for="Role" id="div1lblrolereq" class="requiredmsg" style="font-size:0.8rem;">Required</label>
+                                </div>
+                                <br/>
+                                
+                                                             
+                                <div class="form-group">
+                                        <label for="nextstep" id="lblnextstep" style="font-size:0.8rem;">Next Step</label>
+                                        <select class="form-control" name="nextstep" id="nextstep" style="width:365px;height:45px;line-height:45px;overflow-y:auto;" onChange="fieldscheck();">
+                                            
+                                        </select>
+                                        <label for="NextStep" id="div1lblnextstepreq" class="requiredmsg" style="font-size:0.8rem;">Required</label>
+                                </div> 
+                                <br/>
+                                
+                                
+                                <br/>
+                                <div class="center-btn">
+                                    <button  styleClass="buttonStyle form-submit-btn" id="save" onclick="submitApplication()">Connect With Us</button>
+                                </div>
+                           
+                               
+                          </div>
+                          <!--   </form>-->
+                          </div>
+                          
+                        <div class="mgm-card-bg" style="display:none" id="divThanks">
+                        <div class="centered">
+                            <div class="text-centered" style="text-align:center;">
+                                <apex:outputText style="font-style:italic; font-size:1.4rem; color: #cfa11a; font-weight: bold; text-align: center" value="Thank You!!! You can close this window now.">
+                            </apex:outputText>
+                            </div>
+                            <br/>
+                            <div class="center-btn">
+                                <button styleClass="buttonStyle form-submit-btn" id="goback" onclick="showMembean();">Close</button>
+                            </div>
+                        </div>
+                        </div>
+                        
+        
+        <!-- Modal -->
+  <div class="modal fade" id="myModal" role="dialog">
+    <div class="modal-dialog">
+    
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Thank you For Registering</h4>
+        </div>
+        <div class="modal-body">
+          <p>Thank you for registering your details with us. We will be in touch. </p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+  
+        
+
+    <!--main content end-->
+    <script type='text/javascript' src="{!URLFOR($Resource.CustomFiles,'/MemBean/js/jquery.js')}"></script>
+    <script type='text/javascript' src="{!URLFOR($Resource.CustomFiles,'/MemBean/js/bootstrap.min.js')}"></script>
+        <apex:stylesheet value="{!URLFOR($Resource.CustomFiles,'/MemBean/css/jquery-ui.css' )}" />
+    <script type='text/javascript' src="{!URLFOR($Resource.CustomFiles,'/MemBean/js/jquery-ui.js')}"></script>
+
+    
+    <!--<script src="https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>-->
+
+
+
+
+    <script type="text/javascript">
+        var res = "Yes";
+        var proceed="Yes";
+        var schoolList = [];
+        var cityList = [];
+        var stateList = '{!stateList}';
+        var roleList = $.parseJSON('{!roleList}');
+        var nextstep = $.parseJSON('{!nextstep}');
+        //var conferenceList =$.parseJSON('{!conferenceList}');
+        var schoolListEntry = [];
+        var parseStateList = $.parseJSON(stateList);
+        var isSchoolExist = false;
+        var roleArr  = ['Principal', 'Assistant Principal', 'Teaching &amp; Learning / Curriculum', 'Innovation Officer', 'IB Coordinator', 'Head of English', 'English Teacher', 'Teacher - Other Subjects', 'Others'];
+        var nextstepArr  = ['We&#39;re ready to try it out!', 'Schedule a meeting/demo', 'Send me more information'];
+        var countryArr = ['Afghanistan','Aland Islands','Albania','Algeria','Andorra','Angola','Anguilla','Antarctica','Antigua and Barbuda','Argentina','Armenia','Aruba','Australia','Austria','Azerbaijan','Bahamas','Bahrain','Bangladesh','Barbados','Belarus','Belgium','Belize','Benin','Bermuda','Bhutan','Bolivia','Bosnia and Herzegovina','Botswana','Bouvet Island','Brazil','British Indian Ocean Territory','Brunei Darussalam','Bulgaria','Burkina Faso','Burundi','Cambodia','Cameroon','Canada','Cape Verde','Cayman Islands','Central African Republic','Chad','Chile','China','Chinese Taipei','Christmas Island','Cocos (Keeling) Islands','Colombia','Comoros','Congo','Cook Islands','Costa Rica','Croatia','Cuba','Cyprus','Czech Republic','Denmark','Djibouti','Dominican Republic','Ecuador','Egypt','El Salvador','Equatorial Guinea','Eritrea','Estonia','Ethiopia','Falkland Islands','Faroe Islands','Fiji','Finland','France','French Guiana','Gabon','Gambia','Georgia','Germany','Ghana','Gibraltar','Greece','Greenland','Grenada','Guadeloupe','Guatemala','Guernsey','Guinea','Guyana','Haiti','Honduras','Hungary','Iceland','India','Indonesia','Iran','Iraq','Ireland','Isle of Man','Israel','Italy','Jamaica','Japan','Jersey','Jordan','Kazakhstan','Kenya','Kiribati','Korea','Kuwait','Kyrgyzstan','Latvia','Lebanon','Lesotho','Liberia','Libyan Arab Jamahiriya','Liechtenstein','Lithuania','Luxembourg','Macao','Macedonia','Madagascar','Malawi','Malaysia','Maldives','Mali','Malta','Martinique','Mauritania','Mauritius','Mayotte','Mexico','Moldova','Monaco','Mongolia','Montenegro','Montserrat','Morocco','Mozambique','Myanmar','Namibia','Nauru','Nepal','Netherlands','New Caledonia','New Zealand','Nicaragua','Niger','Nigeria','Niue','Norfolk Island','Norway','Oman','Others','Pakistan','Palestin','Panama','Papua New Guinea','Paraguay','Peru','Philippines','Pitcairn','Poland','Portugal','Qatar','Reunion','Romania','Russian Federation','Rwanda','Saint Kitts and Nevis','Saint Lucia','Saint Martin','Saint Pierre and Miquelon','Saint Vincent and the Grenadines','Samoa','San Marino','Sao Tome and Principe','Saudi Arabia','Senegal','Serbia','Seychelles','Sierra Leone','Singapore','Slovakia','Slovenia','Solomon Islands','Somalia','South Africa','South Sudan','Spain','Sri Lanka','Sudan','Suriname','Svalbard and Jan Mayen','Swaziland','Sweden','Switzerland','Syrian Arab Republic','Tajikistan','Tanzania','Thailand','Timor-Leste','Togo','Tokelau','Tonga','Trinidad and Tobago','Tunisia','Turkey','Turkmenistan','Turks and Caicos Islands','Tuvalu','Uganda','Ukraine','United Arab Emirates','United Kingdom','United States','Uruguay','Uzbekistan','Vanuatu','Venezuela','Viet Nam','British Virgin Islands','Wallis and Futuna','Western Sahara','Yemen','Zambia','Zimbabwe']; 
+        roleList = roleArr;
+        nextstep = nextstepArr;
+        var emailRegx = /^([a-z\d!#$%&'*+\-\/=?^_`{|}~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+(\.[a-z\d!#$%&'*+\-\/=?^_`{|}~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+)*|"((([ \t]*\r\n)?[ \t]+)?([\x01-\x08\x0b\x0c\x0e-\x1f\x7f\x21\x23-\x5b\x5d-\x7e\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|\\[\x01-\x09\x0b\x0c\x0d-\x7f\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))*(([ \t]*\r\n)?[ \t]+)?")@(([a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF][a-z\d\-._~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]*[a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])\.)+([a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF][a-z\d\-._~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]*[a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])\.?$/i;
+        function selectUIHelper(element,list){
+            var option = '';
+            if (element == 'role')
+                list.unshift('Select Role');
+            if (element == 'nextstep')
+                list.unshift('Select NextStep');
+
+            for (var i=0;i<list.length;i++){
+               //alert(list[i]);
+               option += '<option value="'+ list[i] + '">' + list[i] + '</option>';
+            }
+            $('#'+element).append(option);                       
+        }
+        selectUIHelper('State',parseStateList);
+        selectUIHelper('country',countryArr); 
+        selectUIHelper('role',roleList); 
+        selectUIHelper('nextstep',nextstep);
+        //selectUIHelper('conference',conferenceList);
+        function cityUIHelper(cityList){
+            
+            for(var cCount = 0; cCount < cityList.length; cCount++){
+                if(typeof cityList[cCount].City__c != "undefined"){
+                    cityList.push(cityList[cCount].City__c);
+                }
+            }
+             $("#City").autocomplete({
+                minLength: 1,
+                delay: 100,
+                source:cityList
+                //   source: function (req, responseFn) {
+                //    var re = $.ui.autocomplete.escapeRegex(req.term);
+                //    var matcher = new RegExp("^" + re, "i");
+                //    var a = $.grep(citylist, function (item, index) {
+                //        return matcher.test(item);
+                //    });
+                //    responseFn(a);
+                // }
+            });
+           
+        
+        }
+        function getCitiesByState(item) {
+            var state = $('#State').val();   
+            Registration_Clr.getCities(state, function (response, event) {
+                if (event.status) {
+                    if(response != null){
+                        cityUIHelper($.parseJSON(response));
+                    }
+                    
+                }
+                else {
+                    
+                }
+            }, { escape: false, buffer: true });
+            
+
+        }
+        function schoolUIHelper(schoolList){
+            for(var sCount = 0; sCount < schoolList.length; sCount++){
+                    if(typeof schoolList[sCount].Name != "undefined"){
+                        var school = new Object();
+                        school.Name = schoolList[sCount].Name;
+                        school.Id = schoolList[sCount].Id;
+                        schoolListEntry.push(school);
+                        schoolList.push(schoolList[sCount].Name);
+                    }
+             } 
+             
+             $("#School").autocomplete({
+                minLength: 1,
+                delay: 100,
+                source:schoolList
+                //   source: function (req, responseFn) {
+                //    var re = $.ui.autocomplete.escapeRegex(req.term);
+                //    var matcher = new RegExp("^" + re, "i");
+                //    var a = $.grep(citylist, function (item, index) {
+                //        return matcher.test(item);
+                //    });
+                //    responseFn(a);
+                // }
+            });
+           
+        
+        }
+        function getSchoolsByCity(item) {
+             Registration_Clr.getSchools($("#State").val(),$("#City").val(), function (response, event) {
+             console.log('***********');
+             console.log(response);
+             console.log(event);
+                if (event.status) {
+                    if(response != null){
+                        schoolUIHelper($.parseJSON(response));
+                    }
+                    
+                }
+                else {
+                    
+                }
+            }, { escape: false, buffer: true });
+             
+        }
+    
+        function getselectedSchool(schoolName,callback){
+            if(schoolListEntry.length > 0){
+                for(sList = 0; sList < schoolListEntry.length; sList++){
+                    if(schoolListEntry[sList].Name.toLowerCase() == schoolName.toLowerCase()){
+                        callback(schoolListEntry[sList].Id,true);
+                    }
+                    else{
+                        callback(schoolListEntry[sList].Name,false);
+                    }
+                }
+            }  
+              else{
+                callback('',false);
+              }
+            
+          }
+          
+        function validateEmail(inputText)
+        {
+            var mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+            if(inputText.match(mailformat))
+            {
+                return true;
+            }
+            else
+            {
+                document.getElementById("div1lblemailreq").innerHTML = "Invalid Email";
+                document.getElementById("div1lblemailreq").style.display="block";
+                res="No";
+                return false;
+            }
+        }
+        
+        function fieldscheck()
+        {
+            if (document.getElementById("City").value.length==0)
+                document.getElementById("div1lblcityreq").style.display="block";   
+            else
+                document.getElementById("div1lblcityreq").style.display="none";
+                
+            if (document.getElementById("School").value.length==0)
+                document.getElementById("div1lblschoolreq").style.display="block";   
+            else
+                document.getElementById("div1lblschoolreq").style.display="none";
+                
+            if (document.getElementById("fname").value.length==0)
+                document.getElementById("div1lblfnamereq").style.display="block";   
+            else
+                document.getElementById("div1lblfnamereq").style.display="none";
+                
+            if (document.getElementById("lname").value.length==0)
+                document.getElementById("div1lbllnamereq").style.display="block";   
+            else
+                document.getElementById("div1lbllnamereq").style.display="none";
+                  
+            if (document.getElementById("Email").value.length==0)
+                document.getElementById("div1lblemailreq").style.display="block";
+            else
+                document.getElementById("div1lblemailreq").style.display="none";
+                
+            if (document.getElementById("role").value=="Select Role")
+                document.getElementById("div1lblrolereq").style.display="block";   
+            else
+                document.getElementById("div1lblrolereq").style.display="none";
+                
+            if (document.getElementById("nextstep").value=="Select NextStep")
+                document.getElementById("div1lblnextstepreq").style.display="block";   
+            else
+                document.getElementById("div1lblnextstepreq").style.display="none";
+        }
+    
+        function submitApplication(){
+            res="Yes";
+            if (document.getElementById("City").value.length==0)
+            {
+                res = "No";
+            }
+            if (document.getElementById("School").value.length==0)
+            {
+                res = "No";
+            }
+            if (document.getElementById("fname").value.length==0)
+            {
+                res = "No";
+            }
+            if (document.getElementById("lname").value.length==0)
+            {
+                res = "No";
+            }
+            if (document.getElementById("Email").value.length==0)
+            {
+                res = "No";
+            }
+            else
+                validateEmail(document.getElementById("Email").value);
+
+            if (document.getElementById("role").value=="Select Role")
+            {
+                res = "No";
+            }
+
+            if (document.getElementById("nextstep").value=="Select NextStep")
+            {
+                res = "No";
+            }
+            
+            if (res =="Yes")
+            {
+            var checkvalidate = true;
+            if(checkvalidate){
+                if($("#lname").val() == "" || $("#role").val()=="select" || $("#School").val()=="" || $("#Email").val()=="" || $("#nextstep").val()=="select"){
+                    if($("#lname").val() == ""){
+                        $("#lname").next().css('display','block');
+                    }
+                    else{
+                        $("#lname").next().css('display','none');
+                    }
+                   if($("#Email").val()==""){
+                        $("#Email").next().html('This field is required.');
+                    }
+                    else{
+                        $("#Email").next().html('');
+                    }
+                    if($("#School").val()==""){
+                        $("#School").next().css('display','block');
+                    }
+                    else{
+                        $("#School").next().css('display','none');
+                    }
+                    if($("#role").val()=="Select"){
+                        $("#role").next().css('display','block');
+                    }
+                    else{
+                        $("#role").next().css('display','none');
+                    }
+                    if($("#nextstep").val()=="Select"){
+                        $("#nextstep").next().css('display','block');
+                    }
+                    else{
+                        $("#nextstep").next().css('display','none');
+                    }
+                }
+                else{
+                    if(emailRegx.test($("#Email").val())){
+                         checkvalidate = false;
+                        $("#Email").next().html('');
+                    }
+                    else{
+                       
+                        $("#Email").next().html('Please enter a valid Email.');
+                    }
+                    
+                    $("#School,#role,#lname").next().css('display','none');
+                }
+                }    
+            
+             if(!checkvalidate){
+                 $("#save").prop("disabled",true);
+                 var leadRecord = new Object();
+                 leadRecord.FirstName = $("#fname").val();
+                 leadRecord.LastName = $("#lname").val();
+                 if($("#State").val() == "select"){
+                     leadRecord.State = '';
+                 }
+                 else {
+                     leadRecord.State = $("#State").val()
+                 } 
+                  //if($("#conference").val() == "select"){
+                    // leadRecord.Hear_About_Us__c = '';
+                // }
+                // else {
+                  //   leadRecord.Hear_About_Us__c = $("#conference").val()
+                // }
+                 leadRecord.Country = $("#country").val();
+                 leadRecord.Phone = $("#Phone").val();
+                 leadRecord.City = $("#City").val();
+                 leadRecord.Email = $("#Email").val();
+                 leadRecord.Role__c = $("#role").val();
+                 leadRecord.Additional_Comments__c = $("#Comments").val();
+                 leadRecord.Next_Step__c = $("#nextstep").val();
+                 getselectedSchool($("#School").val(),function(result,isSchoolExist){
+                    if(isSchoolExist){
+                        leadRecord.School_Account__c =result; 
+                         leadRecord.Company = $("#School").val();
+                    }   
+                    else{
+                     leadRecord.Company = $("#School").val();
+                   }
+                   });
+                   Registration_Clr.createLead(leadRecord, function (response, event) {
+                   if (event.status) {
+                            if(response){
+                                // $("#myModal").modal("show");
+                                showThanks();
+                            }
+                             //$("#myModal").on('hidden.bs.modal', function () {
+                            //location.reload(false);
+                            //window.location.href = window.location.href;
+                              //});
+                        }
+                        else {
+                            
+                        }
+                    }, { escape: false, buffer: true }); 
+                 
+           }
+           //showThanks();
+           showMembean();
+           }    
+            
+         }
+         
+         function init()
+         {
+            selectElementRole("role","Select Role");
+            selectElementNextStep("nextstep","Select NextStep");
+            selectElementCountry();
+         }
+         
+        function showThanks()
+        {
+            document.getElementById("bg1").style.display="none";
+            document.getElementById("divThanks").style.display="block";
+        }
+        
+        function showMembean()
+        {
+            window.location.href = 'https://www.membean.com';
+        }
+        
+        function showMain()
+        {
+            window.location.href = window.location.href;
+            document.getElementById("City").value='';
+            document.getElementById("School").value='';
+            document.getElementById("fname").value='';
+            document.getElementById("lname").value='';
+            document.getElementById("Email").value='';
+            document.getElementById("Phone").value='';
+            document.getElementById("Country").value='United Arab Emirates';
+            selectElementRole("role","Select Role");
+            selectElementNextStep("nextstep","Select NextStep");
+            document.getElementById("bg1").style.display="block";
+            document.getElementById("divThanks").style.display="none";
+            //fieldscheck();
+            $("#save").prop("disabled",false);
+        }
+        
+        function selectElementRole() {    
+            let element = document.getElementById("role");
+            element.value = "Select Role";
+        }  
+        
+        function selectElementNextStep() {    
+            let element = document.getElementById("nextstep");
+            element.value = "Select NextStep";
+        }
+        
+        function selectElementCountry() {    
+            let element = document.getElementById("country");
+            element.value = "United Arab Emirates";
+        }
+    
+    if('{!stateDefault}' != undefined && '{!stateDefault}' != null && '{!stateDefault}' != ''){
+        var sDfault = '{!stateDefault}';   
+        $("#State option[value='"+sDfault+"']").prop("selected", true);
+        getCitiesByState(sDfault);
+    }
+    </script>
+
+
+</div>
+</div>
+
+
+
+<!--</body>-->
+</html>
+</apex:page>

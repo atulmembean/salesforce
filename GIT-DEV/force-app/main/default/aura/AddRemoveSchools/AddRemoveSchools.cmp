@@ -1,0 +1,13 @@
+<aura:component controller="GroupedOpportunityAddSchoolsController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+	 <!--aura:attribute type="Quote[]" name="quoteList"/-->
+    <aura:attribute name="opportunityList" type="Opportunity" />
+    <aura:attribute name="defaultValue" type="String"/>
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    <aura:if isTrue="{!v.opportunityList.No_of_Quotes__c == 0}">
+        <ui:outputText aura:id="quoteMessage" value="{! 'There are '+' ' +v.opportunityList.No_of_Quotes__c+ ' '+'Quotes in this Opportunity. Please create atleast one quote.' }" />
+        <aura:set attribute="else">
+            <iframe src="{! 'https://membean.my.salesforce.com/apex/GroupedOpportunityAddSchools?Id=' + v.defaultValue }" width="100%" height="500px;" frameBorder="0"/>
+        </aura:set>
+    </aura:if> 
+    
+</aura:component>

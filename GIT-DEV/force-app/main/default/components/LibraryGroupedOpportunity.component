@@ -1,0 +1,12 @@
+<apex:component >
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/> <!--Added for Spinner -->
+    <link href="{!URLFOR($Resource.AngularBootPack,'AngularBootPack/css/ng-table.min.css')}" rel="stylesheet"/>
+    <link href="{!URLFOR($Resource.LoadingAnimation)}" rel="stylesheet"/>
+    <link href="{!URLFOR($Resource.AngularBootPack,'AngularBootPack/css/bootstrap.css')}" rel="stylesheet"/>
+    <apex:includeScript value="{!URLFOR($Resource.JqueryFramework,'/jquery-ui-1.10.3.custom/js/jquery-1.9.1.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.AngularBootPack,'AngularBootPack/js/angular.min.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.AngularBootPack,'AngularBootPack/js/angular-strap.min.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.AngularBootPack,'AngularBootPack/js/ng-table.min.js')}"/>
+    
+</apex:component>

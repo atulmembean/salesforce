@@ -1,0 +1,502 @@
+<apex:page id="thePage" standardController="Opportunity" extensions="GroupedOpportunityAddSchoolsController" 
+           standardStylesheets="false" sidebar="false"
+           showHeader="false" applyBodyTag="false" applyHtmlTag="false"
+           docType="html-5.0">
+    <html ng-app="SchoolSelection" lang="en">
+        <head>
+            <c:LibraryGroupedOpportunity />
+            <title>School Selection</title>
+            <style>
+                .blueColor{
+                color:#ADD8E6;
+                }
+                .greyColor{
+                color:#C0C0C0;
+                }
+                .darkGreyColor{
+                color:#540A0C;
+                }
+                
+                .tableHeader {
+                color: #540A0C;
+                background-color: #ddd;
+                font-weight: bold;
+                padding: 10px;
+                padding-left: 21px;
+                }
+                .fixedHeightScrollable {
+                height:400px;
+                overflow:auto;
+                background:#fff;                
+                padding: 0 12px;
+                border-width: 1px;
+                border-style: solid;
+                border-color: rgb(204, 204, 204);
+                }
+                .centerButtonsDiv {
+                height:400px;
+                overflow:auto;
+                background:#fff; 
+                }
+                .verticalCenter {
+                position: relative;
+                top: 50%;
+                transform: translateY(-50%);
+                }
+                .theadFixed {
+                color: #540A0C;
+                position: fixed;
+                background-color: #ddd;
+                width: 32%;
+                }
+                .btn, .btn:focus, .btn:hover {
+                background-color: #337ab7;
+                color: #fff;
+                }
+                
+                .blockwindow{
+                    width:100%;
+                    height:100%;
+                    top:0;
+                    left:0;
+                    position:fixed;
+                    background-color:rgba(0,0,0,.3);
+                    
+                }
+                #displayLoading{
+                    top:50%;
+                    left:47%;
+                    position:absolute;
+                }
+            </style>
+            <script>
+            var myapp = angular.module('SchoolSelection', ['mgcrea.ngStrap','ngTable']);
+            myapp.factory("SelectionRemoteCalls", ['$q', '$log',function($q, $log) {
+                // No parameters
+                var handleReq = function(remoteCall) {
+                    var defer = $q.defer();
+                    remoteCall(
+                        function(result, event) {
+                            if(event.status) {
+                                defer.resolve(result);
+                            }
+                            else {
+                                $log.error(event.message);
+                                defer.reject(event.message);
+                            }
+                        },
+                        {escape:false, buffer: false}
+                    );
+                    return defer.promise;
+                }
+                // 1 parameter
+                var handleReqParam1 = function(remoteCall, param1) {
+                    var defer = $q.defer();
+                    remoteCall(param1, 
+                               function(result, event) {
+                                   if(event.status) {
+                                       defer.resolve(result);
+                                   }
+                                   else {
+                                       $log.error(event.message);
+                                       defer.reject(event.message);
+                                   }
+                               },
+                               {escape:false, buffer: false}
+                              );
+                    return defer.promise;
+                }
+                // 2 parameter
+                var handleReqParam2 = function(remoteCall, param1, param2) {
+                    var defer = $q.defer();
+                    remoteCall(param1, param2, 
+                               function(result, event) {
+                                   if(event.status) {
+                                       defer.resolve(result);
+                                   }
+                                   else {
+                                       $log.error(event.message);
+                                       defer.reject(event.message);
+                                   }
+                               },
+                               {escape:false, buffer: false}
+                              );
+                    return defer.promise;
+                }
+                
+                return {
+                    getCurrentOpp: function(currentOppId) {
+                        return handleReqParam1(GroupedOpportunityAddSchoolsController.getCurrentOpp, currentOppId);
+                    },
+                    getSection: function(currentOppId) {
+                        return handleReqParam1(GroupedOpportunityAddSchoolsController.getSection, currentOppId);
+                    },
+                    getShowDistrictSection: function(currentOppId) {
+                        return handleReqParam1(GroupedOpportunityAddSchoolsController.getShowDistrictSection, currentOppId);
+                    },
+                    getShowAgencySection: function(currentOppId) {
+                        return handleReqParam1(GroupedOpportunityAddSchoolsController.getShowAgencySection, currentOppId);
+                    },
+                    getDistrictId: function(currentOppId) {
+                        return handleReqParam1(GroupedOpportunityAddSchoolsController.getDistrictId, currentOppId);
+                    },
+                    getLinkedSchoolIds: function(currentOppId) {
+                        return handleReqParam1(GroupedOpportunityAddSchoolsController.getLinkedSchoolIds, currentOppId);
+                    },
+                    getLinkedChildOpps: function(currentOppId) {
+                        return handleReqParam1(GroupedOpportunityAddSchoolsController.getLinkedChildOpps, currentOppId);
+                    },
+                    getLinkedSchools: function(linkedSchoolIds) {
+                        return handleReqParam1(GroupedOpportunityAddSchoolsController.getLinkedSchools, linkedSchoolIds);
+                    },
+                    getNonLinkedSchoolsByDistrictId: function(districtId, oppId) {
+                        return handleReqParam2(GroupedOpportunityAddSchoolsController.getNonLinkedSchoolsByDistrictId, districtId, oppId);
+                    },
+                    getNonLinkedSchoolsByPrefix: function(searchText, schIds) {
+                        return handleReqParam2(GroupedOpportunityAddSchoolsController.getNonLinkedSchoolsByPrefix, searchText, schIds);
+                    },
+                    getSchoolsByPrefix: function(searchText) {
+                        return handleReqParam1(GroupedOpportunityAddSchoolsController.searchSchoolsByPrefix, searchText);
+                    },
+                    getSchoolsByDistrictId: function(districtId) {
+                        return handleReqParam1(GroupedOpportunityAddSchoolsController.searchSchoolsByDistrictId, districtId);
+                    },
+                    saveOpps: function(opp, schools) {
+                        return handleReqParam2(GroupedOpportunityAddSchoolsController.save, opp, schools);
+                    }
+                }
+            }]);
+            
+            myapp.controller('SelectionController', ['SelectionRemoteCalls', '$scope', '$filter', '$q', '$log', '$sce', 'ngTableParams', function(SelectionRemoteCalls, $scope, $filter, $q, $log, $sce, ngTableParams) {
+                $scope.loadbol=false;
+                
+                $scope.loadSchoolSelection = function() {
+                    $scope.currentOppId = '{!currentId}';
+                    $scope.unselectedSchools = [];
+                    $scope.selectedSchools = [];
+                    $scope.unselectedCheck = [];
+                    $scope.selectedCheck = [];
+                    
+                    $q.all({ 
+                        section : SelectionRemoteCalls.getSection($scope.currentOppId),
+                        showDistrictSection : SelectionRemoteCalls.getShowDistrictSection($scope.currentOppId),
+                        showAgencySection : SelectionRemoteCalls.getShowAgencySection($scope.currentOppId),
+                        parentOpp : SelectionRemoteCalls.getCurrentOpp($scope.currentOppId),
+                        linkedSchoolIds : SelectionRemoteCalls.getLinkedSchoolIds($scope.currentOppId),
+                        districtId : SelectionRemoteCalls.getDistrictId($scope.currentOppId),
+                    }).then(function(resp) {
+                        $scope.section = resp.section;
+                        $scope.showDistrictSection = resp.showDistrictSection;
+                        $scope.showAgencySection = resp.showAgencySection;
+                        $scope.parentOpp = resp.parentOpp;
+                        $scope.districtId = resp.districtId;
+                        
+                        if($scope.showDistrictSection) {
+                            $q.all({ 
+                                nonLinkedSchools : SelectionRemoteCalls.getNonLinkedSchoolsByDistrictId($scope.districtId, $scope.currentOppId),                        
+                            }).then(function(resp) {
+                                $scope.unselectedSchools = resp.nonLinkedSchools;
+                            });
+                        }
+                        
+                        $q.all({ 
+                            linkedSchools : SelectionRemoteCalls.getLinkedSchools(resp.linkedSchoolIds), 
+                        }).then(function(resp1) {
+                            $scope.selectedSchools = resp1.linkedSchools;
+                        });
+                    });
+                }
+                
+                $scope.searchSchoolsByPrefix = function() {
+                    var schIds = [];
+                    for(var i=0; i<$scope.selectedSchools.length; i++) {
+                        schIds.push($scope.selectedSchools[i].Id);
+                    }
+                    
+                    $q.all({ 
+                        schools : SelectionRemoteCalls.getNonLinkedSchoolsByPrefix($scope.searchText, schIds),                        
+                    }).then(function(resp) {
+                        $scope.unselectedSchools = resp.schools;
+                        if($scope.unselectedSchools.length == 0) {
+                            $scope.showErrorMsg = true;
+                        } else {
+                            $scope.showErrorMsg = false;
+                        }
+                    });
+                }
+                
+                $scope.addSchools = function() {
+                    for(var i=0; i<$scope.unselectedSchools.length; i++) {
+                        if($scope.unselectedCheck[$scope.unselectedSchools[i].Id] == true) {
+                            $scope.unselectedCheck[$scope.unselectedSchools[i].Id] = false;
+                            $scope.selectedSchools.push($scope.unselectedSchools[i]);
+                            $scope.unselectedSchools.splice(i, 1);
+                            i--;
+                        }
+                    }
+                    $scope.UnselectedSelectAll = false;
+                }
+                
+                $scope.removeSchools = function() {
+                    for(var i=0; i<$scope.selectedSchools.length; i++) {
+                        if($scope.selectedCheck[$scope.selectedSchools[i].Id] == true) {
+                            $scope.selectedCheck[$scope.selectedSchools[i].Id] = false;
+                            $scope.unselectedSchools.push($scope.selectedSchools[i]);
+                            $scope.selectedSchools.splice(i, 1);
+                            i--;
+                        }
+                    }
+                    $scope.SelectedSelectAll = false;
+                }
+                
+                $scope.searchSchoolsByDistrictId = function() {
+                    $q.all({ 
+                        schools : SelectionRemoteCalls.getSchoolsByDistrictId($scope.districtId),                        
+                    }).then(function(resp) {
+                        $scope.unselectedSchools = resp.schools;
+                        if($scope.unselectedSchools.length == 0) {
+                            $scope.showErrorMsg = true;
+                        } else {
+                            $scope.showErrorMsg = false;
+                        }
+                    });
+                }
+                
+                $scope.save=function() {
+                    console.log('$scope.loadbol111111'+$scope.loadbol);
+                    $scope.loadbol=true;
+                    console.log('$scope.loadbol22222222'+$scope.loadbol);
+                    console.log($scope.parentOpp);
+                    console.log($scope.selectedSchools);
+                    
+                    var sSchools = [];
+                    
+                    for(var i=0; i<$scope.selectedSchools.length; i++) {
+                        var sch = {};
+                        sch.Id = $scope.selectedSchools[i].Id;
+                        sch.Name = $scope.selectedSchools[i].Name;
+                        sSchools.push(sch);
+                    }
+                    
+                    $q.all({ 
+                        result : SelectionRemoteCalls.saveOpps($scope.parentOpp, sSchools), 
+                    }).then(function(resp) {
+                          console.log('Method entered');
+                        if(resp.result != null || resp.result != undefined) {
+                            if(resp.result == 'Success') {
+                            console.log('test sucess');
+                                window.top.location = '/'+$scope.currentOppId;
+                            } else {
+                                alert(resp.result);
+                            }
+                        }
+                    });
+                    
+                }
+                
+                $scope.selectUnselectAll=function(str) {
+                    var schoolsList;
+                    if(str == 'Unselected') {
+                        schoolsList = $scope.unselectedSchools;
+                        for(var i=0; i<schoolsList.length; i++) {
+                            $scope.unselectedCheck[schoolsList[i].Id] = $scope.UnselectedSelectAll;
+                        }
+                    } else {
+                        schoolsList = $scope.selectedSchools;
+                        for(var i=0; i<schoolsList.length; i++) {
+                            $scope.selectedCheck[schoolsList[i].Id] = $scope.SelectedSelectAll;
+                        }
+                    }
+                }
+                
+                $scope.cancel=function() {
+                    window.top.location = '/'+$scope.currentOppId;
+                }
+            }]);
+            </script>
+        </head>
+        <body ng-controller="SelectionController" ng-init="loadSchoolSelection()">
+           <!-- <div ng-show="showDistrictSection || showAgencySection">
+                <div class="hotListElement">
+                    <div class="bPageBlock brandSecondaryBrd secondaryPalette">
+                        <div style="padding: 10px;">
+                            <div ng-show="showAgencySection">
+                                <label style="text-align:left;font-weight:bold;padding-right:.69em;padding-left:30px;">Enter School Name</label>
+                                <input type="text" class="form-control" id="searchText" ng-model="searchText" style="display:inline; width:200px;"/>
+                                <button type="button" ng-model="searchBtn" ng-click="searchSchoolsByPrefix()" class="btn">Search</button>
+                            </div>
+                            <br/>
+                            <div ng-show="showErrorMsg">
+                                <label style="text-align:left; padding-right:.69em; padding-left:30px; color:red;">No Results Found</label>
+                            </div>
+                            <br/>
+
+                            <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12">
+                                <div class="col-md-5 col-lg-5 col-sm-5 col-xs-5">
+                                    <div class="bPageBlock brandSecondaryBrd secondaryPalette">
+                                        <div class="pbHeader">
+                                            <div class="pbTitle">
+                                                <div class="tableHeader">
+                                                    <input type="checkbox" ng-model="UnselectedSelectAll" ng-change="selectUnselectAll('Unselected')"/>
+                                                    <a href="">Unselected Schools</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="pbBody fixedHeightScrollable">
+                                            <table class="table" border="0" cellspacing="0" cellpadding="0">
+                                                <tbody>
+                                                    <tr ng-repeat="school in unselectedSchools" ng-class="$index == 0 ? 'dataRow first even' : ($index%2 == 0 ? 'dataRow even' : 'dataRow odd')">
+                                                        <td class="dataCell">
+                                                            <input type="checkbox" ng-model="unselectedCheck[school.Id]"/>
+                                                            <a href="/{{school.Id}}" target="_blank">{{school.Name}}</a>
+                                                        </td>
+                                                    </tr>                        
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-sm-2 centerButtonsDiv">
+                                    <center class="verticalCenter">
+                                        <button type="button" class="btn" ng-click="addSchools()">Add &gt;</button><br/>
+                                        <button type="button" class="btn" ng-click="removeSchools()" style="margin-top:7px">&lt; Remove</button>
+                                    </center>
+                                </div>
+                                
+                                <div class="col-md-5 col-lg-5 col-sm-5 col-xs-5">
+                                    <div class="bPageBlock brandSecondaryBrd secondaryPalette">
+                                        <div class="pbHeader">
+                                            <div class="pbTitle">
+                                                <div class="tableHeader">
+                                                    <input type="checkbox" ng-model="SelectedSelectAll" ng-change="selectUnselectAll('Selected')"/>
+                                                    <a href="">Selected Schools</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="pbBody fixedHeightScrollable">
+                                            <table class="table" border="0" cellspacing="0" cellpadding="0">
+                                                <tbody>
+                                                    <tr ng-repeat="school in selectedSchools" ng-class="$index == 0 ? 'dataRow first even' : ($index%2 == 0 ? 'dataRow even' : 'dataRow odd')">
+                                                        <td class="dataCell">
+                                                            <input type="checkbox" ng-model="selectedCheck[school.Id]"/>
+                                                            <a href="/{{school.Id}}" target="_blank">{{school.Name}}</a>
+                                                        </td>
+                                                    </tr>                        
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-12">
+                                <br/>
+                                <center>
+                                    <button type="button" class="btn" ng-click="save()">Save</button>
+                                    <button type="button" class="btn" ng-click="cancel()">Cancel</button>
+                                </center>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> -->
+            <!-- Added here -->
+            <div ng-show="showDistrictSection || showAgencySection">
+                <div class="hotListElement">
+                    <div class="bPageBlock brandSecondaryBrd secondaryPalette">
+                        <div style="padding: 10px;">
+                            <div ng-show="showAgencySection">
+                                <label style="text-align:left;font-weight:bold;padding-right:.69em;padding-left:30px;">Enter School Name</label>
+                                <input type="text" class="form-control" id="searchText" ng-model="searchText" style="display:inline; width:200px;"/>
+                                <button type="button" ng-model="searchBtn" ng-click="searchSchoolsByPrefix()" class="btn">Search</button>
+                            </div>
+                            <br/>
+                            <div ng-show="showErrorMsg">
+                                <label style="text-align:left; padding-right:.69em; padding-left:30px; color:red;">No Results Found</label>
+                            </div>
+                            <br/>
+
+                            <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12">  <!-- here -->
+                                <div class="col-md-5 col-lg-5 col-sm-5 col-xs-5">
+                                    <!--div class="bPageBlock brandSecondaryBrd secondaryPalette"-->
+                                        <!--div class="pbHeader">
+                                            <div class="pbTitle"-->
+                                                <div class="tableHeader">
+                                                    <input type="checkbox" ng-model="UnselectedSelectAll" ng-change="selectUnselectAll('Unselected')"/>
+                                                    <a href="">Unselected Schools</a>
+                                                </div>
+                                            <!--/div>
+                                        </div -->
+                                        <div class="pbBody fixedHeightScrollable">
+                                            <table class="table" border="0" cellspacing="0" cellpadding="0">
+                                                <tbody>
+                                                    <tr ng-repeat="school in unselectedSchools" ng-class="$index == 0 ? 'dataRow first even' : ($index%2 == 0 ? 'dataRow even' : 'dataRow odd')">
+                                                        <td class="dataCell">
+                                                            <input type="checkbox" ng-model="unselectedCheck[school.Id]"/>
+                                                            <a href="/{{school.Id}}" target="_blank">{{school.Name}}</a>
+                                                        </td>
+                                                    </tr>                        
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    <!--/div-->
+                                </div>
+                                
+                                <div class="col-sm-2 centerButtonsDiv">
+                                    <center class="verticalCenter">
+                                        <button type="button" class="btn" ng-click="addSchools()">Add &gt;</button><br/>
+                                        <button type="button" class="btn" ng-click="removeSchools()" style="margin-top:7px">&lt; Remove</button>
+                                    </center>
+                                </div>
+                                
+                                <div class="col-md-5 col-lg-5 col-sm-5 col-xs-5">
+                                    <!--div class="bPageBlock brandSecondaryBrd secondaryPalette">
+                                        <div class="pbHeader">
+                                            <div class="pbTitle" -->
+                                                <div class="tableHeader">
+                                                    <input type="checkbox" ng-model="SelectedSelectAll" ng-change="selectUnselectAll('Selected')"/>
+                                                    <a href="">Selected Schools</a>
+                                                </div>
+                                            <!--/div>
+                                        </div -->
+                                        <div class="pbBody fixedHeightScrollable">
+                                            <table class="table" border="0" cellspacing="0" cellpadding="0">
+                                                <tbody>
+                                                    <tr ng-repeat="school in selectedSchools" ng-class="$index == 0 ? 'dataRow first even' : ($index%2 == 0 ? 'dataRow even' : 'dataRow odd')">
+                                                        <td class="dataCell">
+                                                            <input type="checkbox" ng-model="selectedCheck[school.Id]"/>
+                                                            <a href="/{{school.Id}}" target="_blank">{{school.Name}}</a>
+                                                        </td>
+                                                    </tr>                        
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                <!--/div -->
+                            </div>
+                            <!--div class="col-sm-12"-->
+                                <br/>
+                                <center>
+                                    <button type="button" class="btn" ng-click="save()">Save</button>
+                                    <button type="button" class="btn" ng-click="cancel()">Cancel</button>
+                                </center>
+                            <!--/div-->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            
+            <!-- Ends -->
+            <div ng-show="!(showDistrictSection || showAgencySection)">
+                
+            </div>
+            <div class="blockwindow" ng-show="loadbol"></div>
+            <div id="displayLoading" ng-show="loadbol">
+                
+                <i style="color:black;font-size:50px;" class="fa fa-spinner fa-spin" ></i>
+            </div>
+            
+        </body>
+    </html>
+</apex:page>

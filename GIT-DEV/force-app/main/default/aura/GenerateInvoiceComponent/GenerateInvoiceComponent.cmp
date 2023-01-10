@@ -1,0 +1,12 @@
+<aura:component controller="SplitSchoolDetailsController_v1" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <!--aura:attribute type="Quote[]" name="quoteList"/-->
+    <aura:attribute name="quoteList" type="Quote" />
+    <aura:attribute name="quoteRecId" type="String"/>
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+   <!-- <aura:if isTrue="{!v.quoteList.Invoice_Count__c >=1}">
+        <ui:outputText aura:id="quoteMessage" value="{! 'Already'+' ' +v.quoteList.Invoice_Count__c+ ' '+'invoice created' }" />
+        <aura:set attribute="else">-->
+            <iframe src="{! 'https://membean.my.salesforce.com/apex/GenerateInvoice?Id=' + v.quoteRecId }" width="100%" height="500px;" frameBorder="0"/>
+    <!--</aura:set>
+    </aura:if> -->
+</aura:component>

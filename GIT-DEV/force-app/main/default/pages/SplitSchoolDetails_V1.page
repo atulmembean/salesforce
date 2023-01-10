@@ -1,0 +1,201 @@
+<apex:page standardStylesheets="false" sidebar="false"
+   showHeader="false" applyBodyTag="false" applyHtmlTag="false"
+   docType="html-5.0" controller="SplitSchoolDetailsController_v1">
+    <html lang="en" ng-app="demoApp">
+        <head>
+            <meta charset="utf-8"/>
+            <meta name="viewport" content="width=device-width, initial-scale=1"/>
+               <title>Split School Details</title>
+               <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/> <!--Added for Spinner -->
+               <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css"/>
+               <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.11/angular.min.js"></script>
+               <script>
+                 // define the app
+                 var demoApp = angular.module('demoApp', []);
+                 // add the controller
+                 demoApp.controller('DemoCtrl', function ($scope) {
+                     $scope.parentOpp = {!parentOpp};
+                     $scope.childOpps = {!childOpps};
+                     $scope.MapValues={!MapVAlues};
+                     $scope.CurrentQuoteId='{!Quoteid}';
+                     $scope.quoteRecords={!QuoteRecords};
+                     console.log('$scope.childOpps');
+                     console.log($scope.childOpps);
+                     console.log($scope.MapValues);
+                     
+                     console.log({!childOpps});
+                     $scope.selectedStudents = 0;
+                     $scope.selectedTeachers = 0;
+                     $scope.showSubmitButton = false;
+                     $scope.showErrorForStudents = false;
+                     $scope.showErrorForTeachers = false;
+                     $scope.showErrorIfTeacherorStudentZero = false; //Added
+                     $scope.quoteId='{!Quoteid}';
+                     $scope.changeStudentAndTeachersSelected = function(){
+                         console.log('it is in ths change method');
+                        $scope.selectedStudents = 0;
+                        $scope.selectedTeachers = 0;
+                        $scope.loadbol=false;
+                        angular.forEach($scope.MapValues,function(key,value){
+                            $scope.selectedStudents = $scope.selectedStudents + key.No_of_Students__c;
+                            $scope.selectedTeachers = $scope.selectedTeachers + key.No_of_Teachers__c;
+                            
+                        });
+                         
+                        if($scope.selectedStudents <= $scope.quoteRecords.Count_Quantity__c ){
+                            $scope.selectedStudentsProgress = $scope.selectedStudents/$scope.quoteRecords.Count_Quantity__c * 100;
+                            $scope.showErrorForStudents = false;
+                        }
+                        else{
+                           //alert('Splited number of students are greater than Total Number of Students');
+                           $scope.showErrorForStudents = true;
+                        }
+                        if($scope.selectedTeachers <= $scope.quoteRecords.Teacher_Count__c){
+                            $scope.selectedTeachersProgress = $scope.selectedTeachers/$scope.quoteRecords.Teacher_Count__c * 100;
+                            $scope.showErrorForTeachers = false;
+                        }
+                        else{
+                           //alert('Splited number of Teachers are greater than Total Number of Teachers');
+                           $scope.showErrorForTeachers = true;
+                        }
+                        
+                        if($scope.selectedTeachers == $scope.quoteRecords.Teacher_Count__c && $scope.selectedStudents == $scope.quoteRecords.Count_Quantity__c ){
+                            $scope.showSubmitButton = true;
+                        }
+                        else{
+                            $scope.showSubmitButton = false;
+                        }
+                     }
+                     $scope.saveRecords=function(){
+                         debugger;
+                         $scope.loadbol=true;
+                         ChilOppList=[];
+                         console.log('$scope.MapValues&&&&&');
+                         console.log($scope.MapValues);
+                        
+                        for (var i = 0; i < $scope.MapValues.length; i++) {
+                            console.log($scope.MapValues[i]['Name']);
+                            //  console.log(Left($scope.MapValues[i]['Name']),80);
+                            var opp = { "Id" : $scope.MapValues[i]['Id'], "Name" : $scope.MapValues[i]['Name'], "No_of_Students__c" : $scope.MapValues[i]['No_of_Students__c'], "No_of_Teachers__c" : $scope.MapValues[i]['No_of_Teachers__c'],"Quote_Name__c":$scope.MapValues[i]['Quote_Name__c'],"Opportunity_Name__c":$scope.MapValues[i]['Opportunity_Name__c']};
+                            if(opp.No_of_Teachers__c==null)opp.No_of_Teachers__c=0;
+                            if(opp.No_of_Students__c==null)opp.No_of_Students__c=0;
+                            if(opp.No_of_Teachers__c==0 && opp.No_of_Students__c==0){
+                                $scope.showErrorIfTeacherorStudentZero = true;
+                                alert('Please fill non zero value for teacher or student'); 
+                                $scope.loadbol=false;
+                            }else{
+                                $scope.showErrorIfTeacherorStudentZero = false;
+                                ChilOppList.push(opp);
+                            }
+                        }
+                        
+                        console.log(ChilOppList);
+                         
+                        var parentOpp = { "Id" : $scope.parentOpp['Id'], "Name" : $scope.parentOpp['Name'], "No_of_Students__c" : $scope.parentOpp['No_of_Students__c'], "No_of_Teachers__c" : $scope.parentOpp['No_of_Teachers__c'],"RecordTypeId" : $scope.parentOpp['RecordTypeId'],"Subscription_End_Year__c" : $scope.parentOpp['Subscription_End_Year__c'],"Subscription_Start_Year__c" : $scope.parentOpp['Subscription_Start_Year__c']};
+                        SplitSchoolDetailsController_v1.SaveSplitSchoolRecords(ChilOppList, function(resp,event){
+                            if(resp != null || resp != undefined) {
+                                if(resp == 'Sucess') {
+                                    if( $scope.showErrorIfTeacherorStudentZero == false){
+                                        window.top.location = '/'+$scope.CurrentQuoteId;
+                                        console.log('Record Updated Successfuly');
+                                    }
+                                } else {
+                                    alert(resp);
+                                }
+                            }
+                        });
+                    }
+                 });
+               </script>
+               <style>
+               .blueColor{
+               color:#ADD8E6;
+               }
+               .greyColor{
+               color:#C0C0C0;
+               }
+               .darkGreyColor{
+               color:#540A0C;
+               }
+               .container{
+                overflow-y: scroll; 
+              }
+               .blockwindow{
+                   width:100%;
+                   height:100%;
+                   top:0;
+                   left:0;
+                   position:fixed;
+                   background-color:rgba(0,0,0,.3);
+                   
+               }
+               #displayLoading{
+                   top:50%;
+                   left:47%;
+                   position:absolute;
+               }
+               </style>
+        </head>
+        
+        <body class="container" ng-controller="DemoCtrl" ng-init="changeStudentAndTeachersSelected()">
+            
+           <h3 style="color:blue">{{parentOpp.Name}}</h3>
+           <table class="table">
+            <tr class="darkGreyColor">
+                <th>Total Number of Students  :  {{quoteRecords.Count_Quantity__c}}</th>
+              
+            </tr>
+            <tr>
+            <td>
+                <span class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="{{selectedStudents}}" aria-valuemin="0" aria-valuemax="{{parentOpp.No_of_Students__c}}" style="width:{{selectedStudentsProgress}}%">{{selectedStudents}}</span>
+            </td>
+            </tr>
+            <tr class="darkGreyColor">
+                <th>Total Number of Teachers  :  {{quoteRecords.Teacher_Count__c}}</th> 
+            </tr>
+            <tr>
+            <td>
+                <span class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="{{selectedTeachers}}" aria-valuemin="0" aria-valuemax="{{parentOpp.No_of_Teachers__c}}" style="width:{{selectedTeachersProgress}}%">{{selectedTeachers}}</span>
+            </td>
+            </tr>
+           </table>
+           <form class="form-inline" role="form">
+          <Div style="color:red" ng-show="showErrorForStudents" >ERROR : Splited number of students are greater than Total Number of Students</div>
+           <Div style="color:red" ng-show="showErrorForTeachers" >ERROR : Splited number of Teachers are greater than Total Number of Teachers</div><br/>
+         <!--  <Div style="color:red" ng-show="showErrorIfTeacherorStudentZero" >ERROR : Please fill non zero value for teacher or student</div><br/> -->
+           <table class="table ">
+             <tr>
+               <th></th>    
+               <th>Name</th>
+               <th>Split number of Students</th>
+               <th>Split number of Teachers</th>
+             </tr>
+             
+             <tr ng-repeat="childOpp in MapValues | filter:query">
+               <td><span class="glyphicon glyphicon-pushpin greyColor"></span></td>
+               <td>{{childOpp.Name}}</td>
+               <td>
+                   <span class="form-group has-success has-feedback">
+                   <input type="number" class="form-control" id="inputSuccess2" min="0" ng-model="childOpp.No_of_Students__c" ng-change = "changeStudentAndTeachersSelected()"/>
+                   <span class="glyphicon glyphicon-pencil form-control-feedback"></span>
+                   </span>
+               </td>
+               <td>
+                   <span class="form-group has-success has-feedback">
+                   <input type="number" class="form-control" id="inputSuccess2" min="0" ng-model="childOpp.No_of_Teachers__c" ng-change = "changeStudentAndTeachersSelected()"/>
+                   <span class="glyphicon glyphicon-pencil form-control-feedback"></span>
+                   </span>
+               </td>
+             </tr>
+            </table>
+            <center>
+                <button type="button" class="btn btn-primary" ng-click="saveRecords()" ng-show="showSubmitButton" >Submit</button>
+           </center>
+           </form>
+            <div class="blockwindow" ng-show="loadbol"></div>
+            <div id="displayLoading" ng-show="loadbol">
+                <i style="color:black;font-size:50px;" class="fa fa-spinner fa-spin" ></i>
+            </div>
+        </body>
+    </html>
+</apex:page>

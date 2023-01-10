@@ -1,0 +1,20 @@
+<apex:page standardController="Account">
+<div id="Accountdiv" style="height:175px;!important;">
+    <apex:pageBlock title="">
+        <apex:pageBlockTable value="{!Account}" var="f">
+            <apex:column value="{!f.Subscription_Status__c}" style="width:250px">
+            </apex:column>
+            <apex:column value="{!f.Population_Purchased_Used__c}" style="width:250px">
+            </apex:column>
+            <apex:column value="{!f.Teachers_Purchased_MB_Teacher_Count_1Y__c}" style="width:250px">
+            </apex:column>
+            <apex:column value="{!f.Fidelity_Report__c}" style="width:250px;color:blue;">
+            </apex:column>
+            <apex:column value="{!f.Subscription_Years__c}" style="width:250px">
+            </apex:column>
+            <apex:column value="{!f.Address__c}" style="width:250px">
+            </apex:column>
+        </apex:pageBlockTable>
+    </apex:pageBlock>
+</div>
+</apex:page>

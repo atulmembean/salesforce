@@ -1,0 +1,21 @@
+<apex:page controller="DisplayDashboardController" showHeader="false" sidebar="false" applyHtmlTag="false" applyBodyTag="false">
+ <!--<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script> -->
+    <script language='javascript'>
+    {!dashboardBlob}
+    </script> 
+   <script> 
+  javascript:function myFunction() {
+      /*alert('this is alert');
+        var dashboardButton = document.getElementById('refreshButton');
+        dashboardButton.click();*/
+                location.reload();
+            }
+      setTimeout(function(){ myFunction(); },6000); 
+    </script> 
+<!-- Other script tried.
+javascript:function autorefresh(){
+         document.getElementById('refreshButton').click();
+        }
+        setTimeout(autorefresh, 180000);
+        autorefresh();-->
+</apex:page>

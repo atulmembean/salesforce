@@ -1,0 +1,144 @@
+<apex:page standardStylesheets="false" sidebar="false"
+   showHeader="false" applyBodyTag="false" applyHtmlTag="false"
+   docType="html-5.0" controller="SplitSchoolDetailsController">
+	<html lang="en" ng-app="demoApp">
+		<head>
+	   		<meta charset="utf-8"/>
+	   		<meta name="viewport" content="width=device-width, initial-scale=1"/>
+			   <title>Angular Demo</title>
+			   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css"/>
+			   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.11/angular.min.js"></script>
+			   <script>
+			     // define the app
+			     var demoApp = angular.module('demoApp', []);
+			     // add the controller
+			     demoApp.controller('DemoCtrl', function ($scope) {
+			         $scope.parentOpp = {!parentOpp};
+			         $scope.childOpps = {!childOpps};
+			         $scope.selectedStudents = 0;
+			         $scope.selectedTeachers = 0;
+			         $scope.showSubmitButton = false;
+			         $scope.showErrorForStudents = false;
+			         $scope.showErrorForTeachers = false;
+			         
+			         $scope.changeStudentAndTeachersSelected = function(){
+			         	$scope.selectedStudents = 0;
+			         	$scope.selectedTeachers = 0;
+			         	angular.forEach($scope.childOpps,function(key,value){
+			         		$scope.selectedStudents = $scope.selectedStudents + key.No_of_Students__c;
+			         		$scope.selectedTeachers = $scope.selectedTeachers + key.No_of_Teachers__c;
+			         		
+			         	});
+			         	if($scope.selectedStudents <= $scope.parentOpp.No_of_Students__c ){
+			         		$scope.selectedStudentsProgress = $scope.selectedStudents/$scope.parentOpp.No_of_Students__c * 100;
+			         		$scope.showErrorForStudents = false;
+			         	}
+			         	else{
+			         	   //alert('Splited number of students are greater than Total Number of Students');
+			         	   $scope.showErrorForStudents = true;
+			         	}
+			         	if($scope.selectedTeachers <= $scope.parentOpp.No_of_Teachers__c){
+			         		$scope.selectedTeachersProgress = $scope.selectedTeachers/$scope.parentOpp.No_of_Teachers__c * 100;
+			         		$scope.showErrorForTeachers = false;
+			         	}
+			         	else{
+			         	   //alert('Splited number of Teachers are greater than Total Number of Teachers');
+			         	   $scope.showErrorForTeachers = true;
+			         	}
+			         	
+			         	if($scope.selectedTeachers == $scope.parentOpp.No_of_Teachers__c && $scope.selectedStudents == $scope.parentOpp.No_of_Students__c ){
+			         		$scope.showSubmitButton = true;
+			         	}
+			         	else{
+			         		$scope.showSubmitButton = false;
+			         	}
+			         }
+			         $scope.saveRecords=function(){
+			         	
+			         	ChilOppList=[];
+        				for (var i = 0; i < $scope.childOpps.length; i++) {
+	                  		var opp = { "Id" : $scope.childOpps[i]['Id'], "Name" : $scope.childOpps[i]['Name'], "No_of_Students__c" : $scope.childOpps[i]['No_of_Students__c'], "No_of_Teachers__c" : $scope.childOpps[i]['No_of_Teachers__c'],"Parent_Opportunity__c" : $scope.childOpps[i]['Parent_Opportunity__c'],"AccountId" : $scope.childOpps[i]['AccountId']};
+			                ChilOppList.push(opp);
+              			}
+              			var parentOpp = { "Id" : $scope.parentOpp['Id'], "Name" : $scope.parentOpp['Name'], "No_of_Students__c" : $scope.parentOpp['No_of_Students__c'], "No_of_Teachers__c" : $scope.parentOpp['No_of_Teachers__c'],"RecordTypeId" : $scope.parentOpp['RecordTypeId'],"Subscription_End_Year__c" : $scope.parentOpp['Subscription_End_Year__c'],"Subscription_Start_Year__c" : $scope.parentOpp['Subscription_Start_Year__c']};
+			            SplitSchoolDetailsController.SaveOppRecords(ChilOppList,parentOpp, function(resp,event){
+			            	if(resp != null || resp != undefined) {
+	                            if(resp == 'Success') {
+	                                window.top.location = '/'+'{!quoteID}';
+	                                console.log('Record Updated Successfuly');
+	                            } else {
+	                                alert(resp);
+	                            }
+                        	}
+			            });
+			        }
+			     });
+			   </script>
+			   <style>
+			   .blueColor{
+			   color:#ADD8E6;
+			   }
+			   .greyColor{
+			   color:#C0C0C0;
+			   }
+			   .darkGreyColor{
+			   color:#540A0C;
+			   }
+			   </style>
+		</head>
+		
+		<body class="container" ng-controller="DemoCtrl" ng-init="changeStudentAndTeachersSelected()">
+		   <h3 style="color:blue">{{parentOpp.Name}}</h3>
+		   <table class="table">
+		   	<tr class="darkGreyColor">
+		   		<th>Total Number of Students  :  {{parentOpp.No_of_Students__c}}</th> 
+		   	</tr>
+		   	<tr>
+		   	<td>
+		   		<span class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="{{selectedStudents}}" aria-valuemin="0" aria-valuemax="{{parentOpp.No_of_Students__c}}" style="width:{{selectedStudentsProgress}}%">{{selectedStudents}}</span>
+		   	</td>
+		   	</tr>
+		   	<tr class="darkGreyColor">
+		   		<th>Total Number of Teachers  :  {{parentOpp.No_of_Teachers__c}}</th> 
+		   	</tr>
+		   	<tr>
+		   	<td>
+		   		<span class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="{{selectedTeachers}}" aria-valuemin="0" aria-valuemax="{{parentOpp.No_of_Teachers__c}}" style="width:{{selectedTeachersProgress}}%">{{selectedTeachers}}</span>
+		   	</td>
+		   	</tr>
+		   </table>
+		   <form class="form-inline" role="form">
+		   <Div style="color:red" ng-show="showErrorForStudents" >ERROR : Splited number of students are greater than Total Number of Students</div>
+		   <Div style="color:red" ng-show="showErrorForTeachers" >ERROR : Splited number of Teachers are greater than Total Number of Teachers</div><br/>
+		   <table class="table ">
+		     <tr>
+		       <th></th>	
+		       <th>Name</th>
+		       <th>Split number of Students</th>
+		       <th>Split number of Teachers</th>
+		     </tr>
+		     <tr ng-repeat="childOpp in childOpps | filter:query">
+		       <td><span class="glyphicon glyphicon-pushpin greyColor"></span></td>
+		       <td>{{childOpp.Name}}</td>
+		       <td>
+		       	   <span class="form-group has-success has-feedback">
+      			   <input type="number" class="form-control" id="inputSuccess2" min="0" ng-model="childOpp.No_of_Students__c" ng-change = "changeStudentAndTeachersSelected()"/>
+                   <span class="glyphicon glyphicon-pencil form-control-feedback"></span>
+    			   </span>
+    		   </td>
+		       <td>
+		           <span class="form-group has-success has-feedback">
+      			   <input type="number" class="form-control" id="inputSuccess2" min="0" ng-model="childOpp.No_of_Teachers__c" ng-change = "changeStudentAndTeachersSelected()"/>
+                   <span class="glyphicon glyphicon-pencil form-control-feedback"></span>
+    			   </span>
+		       </td>
+		     </tr>
+		     
+		   </table>
+		   <center>
+		   		<button type="button" class="btn btn-primary" ng-click="saveRecords()" ng-show="showSubmitButton" >Submit</button>
+		   </center>
+		   </form>
+		</body>
+	</html>
+</apex:page>

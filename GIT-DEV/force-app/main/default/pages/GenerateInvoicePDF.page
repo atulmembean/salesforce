@@ -1,0 +1,690 @@
+<apex:page renderAs="PDF"   applyBodyTag="false" controller="GenerateInvoicePDFController"  standardStylesheets="false" applyHtmlTag="false" showHeader="false">
+   <html>
+        <head>
+            
+            <style>
+                #leftcolumn {
+                width: 50%;
+                /* background-color: #ccff99; */
+                height: 12%;
+                background-color:white;
+                position: absolute;
+                }
+                #rightcolumn {
+                height: 12%;
+                width: 50%;
+                background-color:white;
+                float: right;
+                }
+                #leftcolumn2 {
+                width: 45%;
+                /* background-color: #ccff99; */
+                min-height: 100px;
+                background-color:white;
+                position: absolute;
+                }
+                #rightcolumn2 {
+                min-height: 100px;
+                width: 55%;
+                background-color:white;
+                float: right;
+                }
+                 #leftcolumnForNotes {
+                width: 100%;
+                /* background-color: #ccff99; */
+                /*min-height: 100px;*/
+                background-color:white;
+                position: absolute;
+                }
+                #rightcolumnForTotal {
+                width: 32%;
+                background-color:white;
+                float: right;
+                }
+                #left {
+                width: 50%;
+                /* background-color: #ccff99; */
+                /*min-height: 100px;*/
+                background-color:white;
+                position: absolute;
+                }
+                #middle {
+                width: 10%;
+                background-color:white;
+                position: auto;
+                }
+                #right {
+                width: 40%;
+                background-color:white;
+                float: right;
+                }
+                .TableTitle {
+                background-color:#D7DBDD; 
+              
+                }
+                .text { font-family: "Open Sans";}
+            .styleRowBorder {border-bottom: 1px solid black;} 
+
+            </style>
+        </head>
+    <!-- <apex:pageMessages></apex:pageMessages>--><!-- included for display of errors should they occur -->
+    <!-- <apex:detail inlineEdit="true" relatedList="true" ></apex:detail>--> <!-- included so Account detail information is visible when errors occur -->
+  <!-- <apex:form rendered="{! renderingService != 'PDF' }" style="text-align: right; margin: 10px;">
+        <apex:commandLink action="{!saveToPdf }" value="Save to PDF">
+            <apex:param assignTo="{!renderedFileName }" value="Contact-List.pdf"/>
+        </apex:commandLink>
+    </apex:form>  -->
+      <body>
+      <!--  <apex:pageBlock id="InvRegular" rendered="{!invObj.Quote__r.Quote_Type__c != 'MultiYear'}" >
+        <div>
+            <div id="leftcolumn">        
+                <div style="width:25%;position:absolute;padding-left:25px;">
+                    <img src="{!$Resource.Membean_Logo}" width="150px" height="50px"/> 
+                </div>
+            </div>
+             <div id="rightcolumn">        
+                     <div style="padding-left:100px;position: relative;margin-top:10px;padding-right:0px;">
+                         <i><Span style="text-align:right;font-size:15px;padding-left:0px;">
+                             Membean, Inc.<br/>
+                             10940 SW Barnes Road, #233<br/>
+                             Portland OR 97225<br/>
+                            </Span></i>
+                 </div>
+            </div>
+                            <!-- U.S.A<br/>
+                             Phone 1-866-930-6680 <br/>
+                             Fax 1-503-536-2190 -->
+  <!--          </div><br/><br/><br/><br/><br/><br/>
+            
+            <hr size="2px" width="100%" color="black"/>
+            <i><center><strong>INVOICE</strong></center></i><br/>
+            <i style="float:right"><strong>Invoice #: {!invObj.Name}</strong></i>
+            <apex:pageBlock id="AccountInfo" rendered="{!invObj.Bill_to_different_School__c == false}" >
+                <table style="empty-cells:hide;border:1px black solid;width:50%;" >
+                    <th style="font-size:20px;background-color: #D7DBDD;text-align:center;">Bill To</th>
+                    
+                    <tr rendered="{!invObj.Quote__r.Opportunity.Account.Name !=Null}"> <td>
+                        <apex:outputfield value="{!invObj.Quote__r.Opportunity.Account.Name}" /></td></tr>
+                    <tr rendered="{!invObj.Quote__r.Opportunity.Account.BillingStreet !=Null}"><td>
+                        <apex:outputfield value="{!invObj.Quote__r.Opportunity.Account.BillingStreet}" /></td></tr>
+                    <tr rendered="{!invObj.Quote__r.Opportunity.Account.BillingCity != NULL || invObj.Quote__r.Opportunity.Account.BillingState != NULL}">
+                        <td>
+                            <apex:outputfield value="{!invObj.Quote__r.Opportunity.Account.BillingCity}" /><span>,</span>
+                            <apex:outputfield value="{!invObj.Quote__r.Opportunity.Account.BillingState}" />
+                        </td></tr>
+                   
+                    <tr rendered="{!invObj.Quote__r.Opportunity.Account.BillingPostalCode != NULL}"><td>
+                        <apex:outputfield value="{!invObj.Quote__r.Opportunity.Account.BillingPostalCode}" /></td></tr>
+                    <tr rendered="{!invObj.Quote__r.Opportunity.Account.BillingCountry != NULL}" ><td>
+                        <apex:outputfield value="{!invObj.Quote__r.Opportunity.Account.BillingCountry}" /></td></tr>
+                </table>
+        <br/> 
+        <apex:pageBlockTable style="width:100%;text-align: Center;font-size:20px;"  border="1" value="{!invObj}" var="inv">
+            <apex:column headerclass="TableTitle" style="font-size:17px;text-align: Center;width:30%;" headerValue="Invoice Date" value="{!DAY(inv.Date__c)} {!CASE(MONTH(inv.Date__c), 1, "Jan", 2, "Feb", 3, "Mar",  4, "Apr",  5, "May",  6, "Jun", 7, "Jul", 8, "Aug", 9, "Sep", 10, "Oct", 11, "Nov", 12, "Dec", "None")} {!YEAR(inv.Date__c)}"/>
+            <apex:column headerclass="TableTitle" style="font-size:17px;text-align: Center;width:20%;" headerValue="Terms" value="{!inv.Payment_Terms__c}"/>
+            <apex:column headerclass="TableTitle" style="font-size:17px;text-align: Center;width:30%;" headerValue="Due Date" value="{!DAY(invObj.Due_Date__c)} {!CASE(MONTH(invObj.Due_Date__c), 1, "Jan", 2, "Feb", 3, "Mar",  4, "Apr",  5, "May",  6, "Jun", 7, "Jul", 8, "Aug", 9, "Sep", 10, "Oct", 11, "Nov", 12, "Dec", "None")} {!YEAR(invObj.Due_Date__c)}"/>
+            <apex:column headerclass="TableTitle" rendered="{!invObj.P_O_Number__c != NULL}"  headerValue="P.O.#" style="font-size:17px;text-align: Center;width:20%;"  value="{!inv.P_O_Number__c}"/> 
+        </apex:pageBlockTable>
+        <br/><br/>
+         
+        </apex:pageBlock>
+      <apex:pageBlock id="AccountInfo2" rendered="{!invObj.Bill_to_different_School__c == true}" >
+          <table style="empty-cells:hide;border:1px black solid;width:50%;" >
+            <th style="font-size:20px;background-color: #D7DBDD;text-align:center;">Bill To</th>
+          
+            <tr rendered="{!invObj.Account__r.Name !=Null}"> <td>
+                <apex:outputfield value="{!invObj.Account__r.Name}" /></td></tr>
+            <tr rendered="{!invObj.Account__r.BillingStreet !=Null}"><td>
+                <apex:outputfield value="{!invObj.Account__r.BillingStreet}" /></td></tr>
+            <tr rendered="{!invObj.Account__r.BillingCity != NULL || invObj.Account__r.BillingState != NULL}">
+                <td>
+                <apex:outputfield value="{!invObj.Account__r.BillingCity}" /><span>,</span>
+                 <apex:outputfield value="{!invObj.Account__r.BillingState}" />
+                </td></tr>
+      
+            <tr rendered="{!invObj.Account__r.BillingPostalCode != NULL}"><td>
+                <apex:outputfield value="{!invObj.Account__r.BillingPostalCode}" /></td></tr>
+            <tr rendered="{!invObj.Account__r.BillingCountry != NULL}" ><td>
+                <apex:outputfield value="{!invObj.Account__r.BillingCountry}" /></td></tr>
+        </table>
+          <br/>
+          <apex:pageBlockTable style="width:100%;text-align: Center;font-size:20px;"  border="1" value="{!invObj}" var="inv">
+              <apex:column headerclass="TableTitle" style="font-size:17px;text-align: Center;width:20%;" headerValue="Invoice Date" value="{!DAY(inv.Date__c)} {!CASE(MONTH(inv.Date__c), 1, "Jan", 2, "Feb", 3, "Mar",  4, "Apr",  5, "May",  6, "Jun", 7, "Jul", 8, "Aug", 9, "Sep", 10, "Oct", 11, "Nov", 12, "Dec", "None")} {!YEAR(inv.Date__c)}"/>
+              <apex:column headerclass="TableTitle" style="font-size:17px;text-align: Center;width:10%;" headerValue="Terms" value="{!inv.Payment_Terms__c}"/>
+              <apex:column headerclass="TableTitle" style="font-size:17px;text-align: Center;width:20%;" headerValue="Due Date" value="{!DAY(invObj.Due_Date__c)} {!CASE(MONTH(invObj.Due_Date__c), 1, "Jan", 2, "Feb", 3, "Mar",  4, "Apr",  5, "May",  6, "Jun", 7, "Jul", 8, "Aug", 9, "Sep", 10, "Oct", 11, "Nov", 12, "Dec", "None")} {!YEAR(invObj.Due_Date__c)}"/>
+              <apex:column headerclass="TableTitle" rendered="{!invObj.P_O_Number__c != NULL}" headerValue="P.O.#" style="font-size:17px;text-align: Center;width:20%;"  value="{!inv.P_O_Number__c}"/> 
+              <apex:column headerclass="TableTitle" headerValue="School" style="font-size:17px;text-align: Center;width:30%;"  value="{!inv.Quote__r.Opportunity.Account.Name}"/> 
+          </apex:pageBlockTable>
+          <br/><br/>
+
+        </apex:pageBlock> 
+
+        
+    <apex:pageBlock id="InvoiceInfo3">
+        <div >
+            <table  BORDER="1" CELLSPACING="0" CELLPADDING="2" style="width:100%;"> 
+                <th style="font-size:20px;background-color: #D7DBDD;text-align:center;width:20%">Items</th>
+                <th style="font-size:20px;background-color: #D7DBDD;text-align:center;width:50%">Description</th>
+                <th style="font-size:20px;background-color: #D7DBDD;text-align:center;width:3%">Quantity</th>
+                <th style="font-size:20px;background-color: #D7DBDD;text-align:center;width:10%">Rate</th>
+                <th style="font-size:20px;background-color: #D7DBDD;text-align:center;width:18%">Amount</th>
+                <apex:repeat value="{!invoiceLineItems}" var="invLineItm">
+                <tr>
+                    <td style="font-size:17px;text-align: left;width:20%">{!invLineItm.Product__r.Family}
+                    </td>
+                    <td  style="font-size:17px;text-align: left;width:50%">{!invLineItm.Description__c}
+                    </td>
+                    <td style="font-size:17px;text-align: Center;width:3%">{!invLineItm.Quantity__c}
+                    </td>
+                    <td style="font-size:17px;text-align: right;width:10%">
+                        <apex:outputText value="${0, number, ###,###,###,##0.00}"><apex:param value="{!invLineItm.Unit_Price__c}"/> </apex:outputText>
+                    </td>
+                    <td style="font-size:17px;width:18%;text-align:right;">
+                        <apex:outputText value="${0, number, ###,###,###,##0.00}"><apex:param value="{!invLineItm.Amount__c}"/> </apex:outputText>
+                    </td>
+                </tr>
+                </apex:repeat><br/>
+                <tr><td style="font-size:17px;width:20%;">&nbsp;&nbsp;&nbsp;&nbsp;</td> 
+                    <td  style="font-size:17px;width:50%;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                    <td  style="font-size:17px;width:3%;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                    <td style="font-size:17px;width:10%;text-align:right;"><b>Total:</b></td>
+                    <td style="font-size:17px;width:18%;text-align:right;"><b> <apex:outputText value="${0, number, ###,###,###,##0.00}"><apex:param value="{!invObj.Invoice_Amount__c}"/> </apex:outputText></b> </td>
+                </tr>
+            </table>
+        </div>
+        </apex:pageBlock>
+          
+          <div >
+              <div id="leftcolumnForNotes">
+                  <div style="float:right;position: relative;margin-top:10px;padding-right:0px;">
+                      <Span style="font-size:15px;padding-left:0px;"><b> Notes:</b>  <br/> {!invObj.Notes__c}</span><br/>
+                  </div>
+              </div> 
+                        
+          </div>
+            <br/><br/><br/><br/><br/><br/>
+          <div style=" position:absolute;padding-right:0px;">
+              <Span style="font-size:15px;padding-left:0px;"><b> Terms and Conditions:</b> <br/> {!invObj.Terms_and_Conditions__c}</span><br/>
+          </div>          
+          <br/><br/><br/><br/><br/><br/>
+          <div style=" position:absolute;">
+              <span style="font-size:15px;">Thank you for your business!</span>
+          </div>
+          </apex:pageBlock> -->
+          
+          <!-- For Single year -->
+          <apex:pageBlock id="InvSingle" rendered="{!invObj.Quote__r.Quote_Type__c != 'MultiYear'}" >
+              <div style="width:100%">
+                  <div id="leftcolumn">        
+                      <div style="width:25%;position:absolute;padding-left:25px;">
+                          <apex:outputField value="{!invObj.Membean_Logo__c}"/>
+                        <!-- <apex:image url="{!invObj.Membean_Logo__c}"/>
+                        <img src="/sfc/servlet.shepherd/version/download/068c00000013V98AAE" width="150px" height="40px"/>-->
+                         <!-- <svg aria-hidden="true" class="slds-icon">
+                              <use href="{!URLFOR($Resource.Membean_svg)}"></use>
+                          </svg>-->
+                      </div>
+                  </div>
+                  <div id="rightcolumn">        
+                      <div  class="text" style="padding-left:100px;position: relative;padding-right:0px;">
+                          <Span style="text-align:right;padding-left:0px;font-size:15px;">
+                              Membean, Inc.<br/>
+                              10940 SW Barnes Road, #233<br/>
+                              Portland, OR 97225, USA<br/>
+                              Phone: (866) 930-6680 <br/>
+                              Fax: (503) 536-2190<br/>
+                              Email: billing@membean.com
+                            </Span>
+                      </div>
+               
+                  </div>
+              </div><br/><br/><br/><br/><br/><br/>
+                  <div>
+                  <!-- Add a horizontal line here -->
+                  <hr  size="2px" width="100%" color="black"/>
+                  <i><center><strong>INVOICE</strong></center></i>
+                   <div id="leftcolumn2">
+                       <apex:pageBlock id="AccountInfo" >
+                           <table class="text" style="empty-cells:hide;width:100%;font-size:15px;margin-top:3px;" >
+                           <tr><td>Invoice No: {!invObj.Name}</td></tr>
+                            <tr><td>Invoice Date: {!Month(invObj.Date__c)}/{!DAY(invObj.Date__c)}/{!Year(invObj.Date__c)}</td></tr>
+                            <!--<tr rendered="{!invObj.P_O_Number__c != Null}"><td> <apex:outputLabel rendered="{!invObj.P_O_Number__c != Null}" value="PO No.: "></apex:outputLabel> <apex:outputfield value="{!invObj.P_O_Number__c}" /> </td></tr>-->
+                              <tr><td> <apex:outputLabel value="PO No.: "></apex:outputLabel> <apex:outputfield value="{!invObj.P_O_Number__c}" /> </td></tr>
+                              
+                              <br/>
+
+                              <th style="font-size:15px;">Bill To</th>
+                                  &nbsp;
+                                  <apex:outputfield rendered="{!invObj.Bill_to_different_School__c == false && invObj.Quote__r.Opportunity.Account.Name !=Null}" value="{!invObj.Quote__r.Opportunity.Account.Name}" />
+                                  <apex:outputfield rendered="{!invObj.Bill_to_different_School__c == true && invObj.Account__r.Name!=Null}" value="{!invObj.Account__r.Name}" />
+                               <!--<tr rendered="{!invObj.Quote__r.Quote_PDF_Bill_To__c != NULL}">
+                               <td>
+                                  <apex:outputfield value="{!invObj.Quote__r.Quote_PDF_Bill_To__c}" />
+                               </td>
+                               </tr>-->
+                               <br/>
+                               &nbsp;
+                              <apex:outputfield value="{!invObj.Billing_Street__c}" rendered="{!invObj.Billing_Street__c!= NULL}"/>
+                              <br/>
+                               
+                               
+                                                            
+                              &nbsp;
+                              <apex:outputfield value="{!invObj.Bill_To_Pdf__c}" rendered="{!invObj.Bill_To_Pdf__c != NULL}"/>
+                              <br/>
+                              &nbsp;
+                              <apex:outputfield value="{!invObj.Billing_Country__c}" rendered="{!invObj.Billing_Country__c != NULL}"/>
+                          </table>
+                     </apex:pageBlock>
+   
+                  </div>
+                  <div id="rightcolumn2" style="padding-left:100px;">
+                      <div style="padding-left:100px;">
+                          <!-- <apex:pageBlock id="AccountInfo4" rendered="{!AND(invObj.Account__c!=null, invObj.Account_of_Contact__c!=null , invObj.Account__c!=invObj.Account_of_Contact__c)}" > -->
+                           <apex:pageBlock id="AccountInfo4">
+                           <table class="text" style="empty-cells:hide;width:100%;font-size:15px;" >
+                              <!--<th style="font-size:20px;">Prepared by</th> --><!--background-color: #D7DBDD;border:1px black solid;-->
+                              <!--<tr><td>Invoice No: {!invObj.Name}</td></tr>
+                              <tr><td>Invoice Date: {!Month(invObj.Date__c)}/{!DAY(invObj.Date__c)}/{!Year(invObj.Date__c)}</td></tr>-->
+                              <tr><td>Terms: {!invObj.Payment_Terms__c}</td></tr>
+                              <tr><td>Due Date: {!Month(invObj.Due_Date__c)}/{!DAY(invObj.Due_Date__c)}/{!Year(invObj.Due_Date__c)}</td></tr>
+                              <!--<tr rendered="{!invObj.P_O_Number__c != Null}"><td> <apex:outputLabel rendered="{!invObj.P_O_Number__c != Null}" value="PO No.: "></apex:outputLabel> <apex:outputfield value="{!invObj.P_O_Number__c}" /> </td></tr>
+                             <tr><td>Subscription Expiry: {!invObj.Quote__r.Opportunity.Account.Academic_End_Month__c} {!invObj.Quote__r.Opportunity.Subscription_End_Year__c}</td></tr> -->
+                              <tr><td>Subscription Expiry: {!invObj.Subscription_Expiry_Month__c} {!CASE((invObj.Subscription_Expiry_Month__c), "January", "31", "February", "28", "March", "31",  "April", "30",  "May", "31",  "June", "30", "July", "31", "August", "31", "September", "30", "October", "31", "November", "30", "December", "31", "None")}, {!invObj.Quote__r.Opportunity.Subscription_End_Year__c}</td></tr>
+                          
+                              <apex:pageBlock id="ShipToSingle" rendered="{!invObj.Account__c != Null}">
+                              <br/>
+                              <th style="font-size:15px;">Ship To</th>
+                              &nbsp;
+                                  <apex:outputfield value="{!invObj.Account_of_Contact__r.Name}"  />
+                                  <br/>
+                              &nbsp;
+                              <apex:outputfield value="{!invObj.Account_of_Contact__r.BillingStreet}" rendered="{!invObj.Account_of_Contact__r.BillingStreet != NULL && invObj.Account__c != Null}"/> 
+                              <br/>
+                              
+                              &nbsp;
+                              <apex:outputfield value="{!invObj.Ship_To_Pdf__c}" rendered="{!invObj.Ship_To_Pdf__c != NULL && invObj.Account__c != Null}"/>
+                              <br/>
+                              &nbsp;
+                              <apex:outputfield value="{!invObj.Account_of_Contact__r.BillingCountry}" rendered="{!invObj.Account_of_Contact__r.BillingCountry != NULL && invObj.Account__c != Null}"/>
+                              </apex:pageBlock>
+
+                              
+                              </table>
+                        </apex:pageBlock>
+                      </div>
+                      
+                  </div>
+                  
+              </div><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/> 
+              
+            
+                  <div style="">
+                      <table  class="text" style="width:100%;font-size:15px;"> <!-- border:1px black solid; -->
+                          <th style="font-size:14px;text-align:center;width:60%">Items</th>
+                       <!--<th style="font-size:20px;background-color: #D7DBDD;text-align:center;width:5%">Description</th> -->
+                          <th style="font-size:14px;text-align:center;width:10%">Quantity</th>
+                          <th  style="width:9%">&nbsp;&nbsp;</th>
+                          <th style="font-size:14px;text-align:center;width:7%">Rate</th>
+                          <th style="font-size:14px;text-align:center;width:19%">Total</th>
+                          <br/>
+                          <apex:repeat value="{!invoiceLineItems}" var="invLineItm">
+                              <tr> <!-- style="border-bottom: 1px solid #000;-->
+                                  <td style="font-size:15px;text-align: left;width:60%">
+                                      {!invLineItm.Product__r.Family} <br/><br/>
+                                      {!invLineItm.Description_Line_Item__c}
+                                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                  </td>
+                                  <td>&nbsp;&nbsp;</td>
+                                  <td style="font-size:15px;text-align: Center;width:10%">{!invLineItm.Quantity__c}
+                                  </td>
+                                  <td style="font-size:15px;text-align: Center;padding:0px;width:4%">
+                                    X
+                                  </td>
+                               <!--   <td style="font-size:17px;text-align: Center;">${!invLineItm.Unit_Price__c}  </td> -->
+                                  <td style="font-size:15px;width:10%;padding:0px;text-align:right;">
+                                      <apex:outputText rendered="{!invLineItm.Product__r.Family != 'Discounts'}" value="${0, number, ###,###,###,##0.00}"><apex:param value="{!invLineItm.Unit_Price__c}"/> </apex:outputText>
+                                      <apex:outputText rendered="{!invLineItm.Product__r.Family == 'Discounts'}" value="-${0, number, ###,###,###,##0.00}"><apex:param value="{!ABS(invLineItm.Unit_Price__c)}"/> </apex:outputText>
+                                  </td>
+                               <!--    <td style="font-size:17px;text-align: Center;">${!invLineItm.Amount__c}</td> -->
+                                  <td style="font-size:15px;width:12%;padding:0px;text-align:right;">
+                                      <apex:outputText rendered="{!invLineItm.Product__r.Family != 'Discounts'}"  value="${0, number, ###,###,###,##0.00}"><apex:param value="{!invLineItm.Amount__c}"/> </apex:outputText>
+                                      <apex:outputText rendered="{!invLineItm.Product__r.Family == 'Discounts'}" value="-${0, number, ###,###,###,##0.00}"><apex:param value="{!ABS(invLineItm.Amount__c)}"/> </apex:outputText>
+                                  </td>
+                              </tr>
+                          <tr><td><hr/></td><td><hr/></td><td><hr/></td><td><hr/></td><td><hr/><td><hr/></td><td><hr/></td></td></tr> 
+                          </apex:repeat>
+                          </table>
+                      <table class="text" style="width:100%;font-size:15px;">
+                          <tr><td style="width:50%">&nbsp;</td><td style="width:15%">&nbsp;</td><td style="width:10%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                              <td style="width:10%;font-size:15px;"><b>Total</b></td>
+                              <td style="width:15%;padding:0px;text-align:right;font-size:15px;"><b><apex:outputText value="${0, number, ###,###,###,##0.00}"><apex:param value="{!InvoiceTotalAmount}"/> </apex:outputText></b></td>
+                          </tr>
+                      </table>
+              </div><br/>
+              <div id="divDesp1">
+                <span  class="text" style="font-size:15px;"> Please reach out with any questions. Looking forward to creating word magic with you!</span> 
+              </div>
+              <!--<div id="divDesp2">-->
+                  <apex:pageBlock >
+                  <apex:pageBlockSection >
+                  <div id="">
+                      <div style="position:relative;margin-top:10px;padding-right:0px;font-size:15px;">
+                          <!--       <Span style="font-size:15px;padding-left:0px;"> <b>Notes: </b> <br/> {!invObj.Notes__c}</span><br/> -->
+                          <span  class="text" style="font-size:15px;"> <b>Notes: </b></span>
+                          <table>
+                              <!--<th>Notes:</th>-->
+                              <apex:repeat value="{!notesInvoice}" var="notes">
+                                  <tr>
+                                      <td>{!notes}</td>
+                                  </tr>
+                              </apex:repeat>
+                          </table>
+                      </div>
+                  </div>
+                  </apex:pageBlocksection>
+                  </apex:pageBlock> <br/><br/><br/><br/><br/><br/><br/>
+                  <apex:pageBlock >
+                  <apex:pageBlocksection >
+                  <div style="position:relative;margin-top:25px;padding-right:0px;">
+                      <Span style="font-size:15px;padding-left:0px;"><b> Terms and Conditions:</b> <br/> {!invObj.Terms_and_Conditions__c}</span><br/>
+                  </div>
+                  </apex:pageBlocksection> 
+                  </apex:pageBlock>         
+                  <br/><br/><br/><br/><br/><br/>
+                  <div style=" position:relative;margin-top:25px;">
+                      <span style="font-size:15px;">Thank you for your business!</span>
+                  </div>
+           
+              <!--</div>-->
+          </apex:pageBlock>
+          <!-- Ends here -->
+               
+          <!-- For Multi year -->
+          <apex:pageBlock id="InvMulti" rendered="{!invObj.Quote__r.Quote_Type__c == 'MultiYear'}" >
+              <div style="width:100%">
+                  <div id="leftcolumn">        
+                      <div style="width:25%;position:absolute;padding-left:25px;">
+                          <apex:outputField value="{!invObj.Membean_Logo__c}"/>
+                          <!--<img src="{!$Resource.Membean_Logo}" width="150px" height="40px"/> -->
+                      </div>
+                  </div>
+                  <div id="rightcolumn">        
+                      <div  class="text" style="padding-left:100px;position: relative;padding-right:0px;">
+                          <Span style="text-align:right;font-size:15px;padding-left:0px;">
+                              Membean, Inc.<br/>
+                              10940 SW Barnes Road, #233<br/>
+                              Portland, OR 97225, USA<br/>
+                              Phone: (866) 930-6680 <br/>
+                              Fax: (503) 536-2190<br/>
+                              Email: billing@membean.com
+                          </Span>
+                      </div>
+               
+                  </div>
+              </div><br/><br/><br/><br/><br/><br/>
+                  <div>
+                  <!-- Add a horizontal line here -->
+                  <hr size="2px" width="100%" color="black"/>
+                  <i><center><strong>INVOICE</strong></center></i><br/>
+                  
+                  <div id="leftcolumn2">
+                      <apex:pageBlock id="AccountInfo2" >
+                           <table class="text" style="empty-cells:hide;width:100%;font-size:15px;margin-top:3px;" >
+                           <tr><td>Invoice No: {!invObj.Name}</td></tr>
+                            <tr><td>Invoice Date: {!Month(invObj.Date__c)}/{!DAY(invObj.Date__c)}/{!Year(invObj.Date__c)}</td></tr>
+                            <tr><td> <apex:outputLabel value="PO No.: "></apex:outputLabel> <apex:outputfield value="{!invObj.P_O_Number__c}" /> </td></tr>
+                            <br/>
+                           
+                           
+                              <th style="font-size:15px;">Bill To</th>
+                                  &nbsp;
+                                  <apex:outputfield rendered="{!invObj.Bill_to_different_School__c == false && invObj.Quote__r.Opportunity.Account.Name !=Null}" value="{!invObj.Quote__r.Opportunity.Account.Name}" />
+                                  <apex:outputfield rendered="{!invObj.Bill_to_different_School__c == true && invObj.Account__r.Name!=Null}" value="{!invObj.Account__r.Name}" />
+                             <br/>
+                             &nbsp;
+                             <apex:outputfield value="{!invObj.Billing_Street__c}" rendered="{!invObj.Billing_Street__c != NULL}"/> 
+                             <br/> 
+                             <!-- <tr rendered="{!invObj.Billing_Street__c !=Null}"><td>
+                                  <apex:outputfield value="{!invObj.Billing_Street__c}"/></td>
+                              </tr> -->
+                              <!--<tr rendered="{!invObj.Billing_City__c != NULL}"><td>
+                                  <apex:outputfield value="{!invObj.Billing_City__c}" />
+                                  </td>
+                              </tr>-->
+                              <!-- <tr rendered="{!invObj.Billing_City__c != NULL || invObj.Billing_State_Province__c!= Null || invObj.Billing_Zip_Postal_Code__c != NULL}"><td>
+                                  <apex:outputfield value="{!invObj.Billing_City__c}" /><span>&nbsp;</span>
+                                  <apex:outputfield value="{!invObj.Billing_State_Province__c}"/> <span>&nbsp;</span>
+                                  <apex:outputfield value="{!invObj.Billing_Zip_Postal_Code__c}" /></td></tr>
+                              <tr rendered="{!invObj.Billing_Country__c != NULL}"><td>
+                                  <apex:outputfield value="{!invObj.Billing_Country__c}" /></td></tr> -->
+                              <!--<tr rendered="{!invObj.Quote__r.Quote_PDF_Bill_To__c != NULL}">
+                              <td>
+                                  <apex:outputfield value="{!invObj.Quote__r.Quote_PDF_Bill_To__c}" />
+                              </td>
+                              </tr>-->
+                              &nbsp;
+                              <apex:outputfield value="{!invObj.Bill_To_Pdf__c}" rendered="{!invObj.Bill_To_Pdf__c != NULL}"/>
+                              <br/>
+                              &nbsp;
+                              <apex:outputfield value="{!invObj.Billing_Country__c}" rendered="{!invObj.Billing_Country__c != NULL}"/>
+                          </table>
+                     </apex:pageBlock>
+                      
+                      
+                      
+                      
+               <!--        <apex:pageBlock id="AccountInfo" rendered="{!invObj.Bill_to_different_School__c == false}" >
+                          <table class="text" style="empty-cells:hide;width:100%;font-size:15px;" >
+                              <th style="font-size:15px;">Bill To</th>
+                              
+                              <tr rendered="{!invObj.Quote__r.Opportunity.Account.Name !=Null}"> <td>
+                                  <apex:outputfield value="{!invObj.Quote__r.Opportunity.Account.Name}" /></td></tr>
+                              <tr rendered="{!invObj.Quote__r.Opportunity.Account.BillingStreet !=Null}"><td>
+                                  <apex:outputfield value="{!invObj.Quote__r.Opportunity.Account.BillingStreet}" /></td>
+                              </tr>
+                              <tr rendered="{!invObj.Quote__r.Opportunity.Account.BillingCity != NULL || invObj.Quote__r.Opportunity.Account.BillingState != Null}"><td>
+                                  <apex:outputfield value="{!invObj.Quote__r.Opportunity.Account.BillingCity}" /><span>, </span>
+                                  <apex:outputfield value="{!invObj.Quote__r.Opportunity.Account.BillingState}"/> 
+                                  </td>
+                              </tr> 
+                          <!--    <tr rendered="{!invObj.Quote__r.Opportunity.Account.BillingState != NULL}"><td>
+                                  <apex:outputfield value="{!invObj.Quote__r.Opportunity.Account.BillingState}"/> </td>
+                             </tr> -->
+        <!--                      <tr rendered="{!invObj.Quote__r.Opportunity.Account.BillingPostalCode != NULL}"><td>
+                                  <apex:outputfield value="{!invObj.Quote__r.Opportunity.Account.BillingPostalCode}" /></td></tr>
+                              <tr rendered="{!invObj.Quote__r.Opportunity.Account.BillingCountry != NULL}" ><td>
+                                  <apex:outputfield value="{!invObj.Quote__r.Opportunity.Account.BillingCountry}" /></td></tr>
+                          </table>
+                     </apex:pageBlock>
+                      
+                      <apex:pageBlock id="AccountInfo2" rendered="{!invObj.Bill_to_different_School__c == true}" >
+                          <table  class="text" style="empty-cells:hide;width:100%;font-size:15px;" >
+                              <th style="font-size:15px;">Bill To</th>
+                              <tr rendered="{!invObj.Account__r.Name !=Null}"> <td>
+                                  <apex:outputfield value="{!invObj.Account__r.Name}" /></td></tr>
+                              <tr rendered="{!invObj.Account__r.BillingStreet !=Null}"><td>
+                                  <apex:outputfield value="{!invObj.Account__r.BillingStreet}" /></td></tr>
+                             <!-- <tr rendered="{!invObj.Account__r.BillingCity != NULL}"><td>
+                                  <apex:outputfield value="{!invObj.Account__r.BillingCity}" /></td></tr> -->
+     <!--                         <tr rendered=" {!invObj.Account__r.BillingCity != NULL || invObj.Account__r.BillingState != NULL}"><td>
+                                  <apex:outputfield value="{!invObj.Account__r.BillingCity}" /><span>,</span>
+                                  <apex:outputfield value="{!invObj.Account__r.BillingState}"/>
+                                  </td></tr>
+                             <tr rendered="{!invObj.Account__r.BillingPostalCode != NULL}"><td>
+                                  <apex:outputfield value="{!invObj.Account__r.BillingPostalCode}" /></td></tr>
+                              <tr rendered="{!invObj.Account__r.BillingCountry != NULL}" ><td>
+                                  <apex:outputfield value="{!invObj.Account__r.BillingCountry}" /></td></tr>
+                          </table>
+                      </apex:pageBlock> -->
+                      
+                  </div>
+                  <div id="rightcolumn2">
+                      <div style="padding-left:100px;">
+                          <!--<apex:pageBlock id="AccountInfo3" rendered="{!AND(invObj.Account__c!=null, invObj.Account_of_Contact__c!=null , invObj.Account__c!=invObj.Account_of_Contact__c)}" >-->
+                           <apex:pageBlock id="AccountInfo3">
+                           <table class="text" style="empty-cells:hide;width:100%;font-size:15px;" >
+                              <!--<th style="font-size:20px;">Prepared by</th> --><!--background-color: #D7DBDD;border:1px black solid;-->
+                              
+                              <tr><td>Terms: {!invObj.Payment_Terms__c}</td></tr>
+                              <tr><td>Due Date: {!Month(invObj.Due_Date__c)}/{!DAY(invObj.Due_Date__c)}/{!Year(invObj.Due_Date__c)}</td></tr>
+                              <tr><td>Subscription Expiry: {!invObj.Subscription_Expiry_Month__c} {!CASE((invObj.Subscription_Expiry_Month__c), "January", "31", "February", "28", "March", "31",  "April", "30",  "May", "31",  "June", "30", "July", "31", "August", "31", "September", "30", "October", "31", "November", "30", "December", "31", "None")}, {!invObj.Quote__r.Opportunity.Subscription_End_Year__c}</td></tr>
+                              <apex:pageBlock id="ShipToMultiple" rendered="{!invObj.Account__c != Null}">
+                              <br/>
+                              <th style="font-size:15px;">Ship To</th>
+                              
+                                   &nbsp;
+                                  <apex:outputfield value="{!invObj.Account_of_Contact__r.Name}" />
+                              <br/>
+                              &nbsp;
+                              <apex:outputfield value="{!invObj.Account_of_Contact__r.BillingStreet}" rendered="{!invObj.Account_of_Contact__r.BillingStreet != NULL}"/>     
+                             <br/>
+                             <!--  <tr rendered="{!invObj.Account_of_Contact__r.ShippingStreet !=Null}"><td>
+                                  <apex:outputfield value="{!invObj.Account_of_Contact__r.ShippingStreet}"/></td>
+                              </tr> -->
+                              <!--<tr rendered="{!invObj.Account_of_Contact__r.ShippingCity != NULL}"><td>
+                                  <apex:outputfield value="{!invObj.Account_of_Contact__r.ShippingCity}" />
+                                  </td>
+                              </tr>-->
+                              <!-- <tr rendered="{!invObj.Account_of_Contact__r.ShippingCity != NULL || invObj.Account_of_Contact__r.ShippingState!= Null || invObj.Account_of_Contact__r.ShippingPostalCode != NULL}"><td>
+                                  <apex:outputfield value="{!invObj.Account_of_Contact__r.ShippingCity}" /> <span>&nbsp;</span>
+                                  <apex:outputfield value="{!invObj.Account_of_Contact__r.ShippingState}"/> <span>&nbsp;</span>
+                                  <apex:outputfield value="{!invObj.Account_of_Contact__r.ShippingPostalCode}" /></td></tr>
+                              <tr rendered="{!invObj.Account_of_Contact__r.ShippingCountry != NULL}"><td>
+                                  <apex:outputfield value="{!invObj.Account_of_Contact__r.ShippingCountry}" /></td></tr>--> 
+                              <!--<tr rendered="{!invObj.Quote__r.Quote_PDF_Ship_To__c != NULL}">
+                                  <td>
+                                      <apex:outputfield value="{!invObj.Quote__r.Quote_PDF_Ship_To__c}" />
+                                  </td>
+                              </tr>-->
+                              &nbsp;
+                              <apex:outputfield value="{!invObj.Ship_To_Pdf__c}" rendered="{!invObj.Ship_To_Pdf__c != NULL}"/>
+                              <br/>
+                              &nbsp;
+                              <apex:outputfield value="{!invObj.Account_of_Contact__r.BillingCountry}" rendered="{!invObj.Account_of_Contact__r.BillingCountry != NULL}"/>
+                              </apex:pageblock>
+                          </table>
+                     </apex:pageBlock>
+                          
+                      </div>
+                      
+                  </div>
+                  
+              </div><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+                <div style="">
+                      <table  class="text" style="width:100%;font-size:15px;"> <!-- border:1px black solid; -->
+                          <th style="font-size:15px;text-align:center;width:60%">Items</th>
+                       <!--<th style="font-size:20px;background-color: #D7DBDD;text-align:center;width:5%">Description</th> -->
+                          <th style="font-size:15px;text-align:center;width:10%">Quantity</th>
+                          <th  style="width:9%">&nbsp;&nbsp;</th>
+                          <th style="font-size:15px;text-align:center;width:7%">Rate</th>
+                          <th style="font-size:15px;text-align:center;width:19%">Total</th>
+                          <br/>
+                          <apex:repeat value="{!invoiceLineItemsMulti}" var="invLineItm">
+                              <tr> <!-- style="border-bottom: 1px solid #000;-->
+                                  <td style="font-size:15px;text-align: left;width:60%;">
+                                      {!invLineItm.Product__r.Family} <br/><br/>
+                                      {!invLineItm.Description_Line_Item__c}
+                                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                  </td>
+                                  <td>&nbsp;&nbsp;</td>
+                                  <td style="font-size:15px;text-align: Center;width:10%;">{!invLineItm.Quantity__c}
+                                  </td>
+                                  <td style="font-size:15px;text-align: Center;padding:0px;width:4%;">
+                                    X
+                                  </td>
+                               <!--   <td style="font-size:17px;text-align: Center;">${!invLineItm.Unit_Price__c}  </td> -->
+                                  <td style="width:10%;padding:0px;text-align:right;"><apex:outputText value="${0, number, ###,###,###,##0.00}"><apex:param value="{!invLineItm.Unit_Price__c}"/> </apex:outputText></td>
+                               <!--    <td style="font-size:17px;text-align: Center;">${!invLineItm.Amount__c}</td> -->
+                                  <td style="width:12%;padding:0px;text-align:right;"><apex:outputText value="${0, number, ###,###,###,##0.00}"><apex:param value="{!invLineItm.Amount__c}"/> </apex:outputText></td>
+                              </tr>
+                          <tr><td><hr/></td><td><hr/></td><td><hr/></td><td><hr/></td><td><hr/></td><td><hr/></td><td><hr/></td></tr> 
+                          </apex:repeat>
+                          </table>
+                          <table  class="text" style="width:100%;font-size:15px;">
+                          <tr><td style="width:44%">&nbsp;</td>
+                              <td style="width:41%">1 year subscription @ <apex:outputText value=" ${0, number, ###,###,###,##0.00}"><apex:param value="{!invoiceLineItemsTotalAmount}" /></apex:outputText> x {!invObj.Quote__r.No_Years__c} yrs</td>
+                             <!-- <td style="width:11%;padding:0px;">  ${!invoiceLineItemsTotalAmount * invObj.Quote__r.No_Years__c}</td> -->
+                              <td style="width:15%;padding:0px;text-align:right;"><apex:outputText value="${0, number, ###,###,###,##0.00}"><apex:param value="{!invoiceLineItemsTotalAmount * invObj.Quote__r.No_Years__c}"/> </apex:outputText></td>
+                          </tr>
+                          <tr><td>&nbsp;</td><td><hr/></td><td><hr/></td></tr>
+                          <tr><td style="width:44%">&nbsp;</td>
+                          <td style="width:41%">Discount {!invObj.Quote__r.Discount__c}% ({!invObj.Quote__r.No_Years__c}-yr subscription)</td>
+                        <!--  <td style="width:41%">Discount {!invObj.Quote__r.Total_Discounts__c}% ({!invObj.Quote__r.No_Years__c}-yr subscription)</td> -->
+                          <!--<td> ${!invObj.Quote__r.Total_Discounts__c /100 * invoiceLineItemsTotalAmount * invObj.Quote__r.No_Years__c}</td> -->
+                       <!--   <td style="width:11%;padding:0px;">-${!InvoiceDiscount}</td> -->
+                          <td style="width:15%;padding:0px;text-align:right;"><apex:outputText value="-${0, number, ###,###,###,##0.00}"><apex:param value="{!InvoiceDiscount}"/> </apex:outputText></td>
+                          </tr>
+                          <tr><td>&nbsp;</td><td><hr/></td><td><hr/></td></tr>
+                          <tr><td style="width:44%">&nbsp;</td>
+                          <td style="width:41%;"><b>Total</b></td>
+                          <!--<td>${(!((invoiceLineItemsTotalAmount * invObj.Quote__r.No_Years__c)-(invObj.Quote__r.Total_Discounts__c /100 * invoiceLineItemsTotalAmount * invObj.Quote__r.No_Years__c)).setScale(2))}</td>-->  
+                       <!--   <td style="width:10%;padding:0px;"> ${!InvoiceTotalAmount} </td>  Commented here without comma-->
+                          <td style="width:15%;padding:0px;text-align:right;"><b><apex:outputText value="${0, number, ###,###,###,##0.00}"><apex:param value="{!InvoiceTotalAmount}"/> </apex:outputText></b></td>
+                          </tr>
+                      </table>
+              </div><br/>
+              <div id="divDesp1">
+                <span  class="text" style="font-size:15px;"> Please reach out with any questions. Looking forward to creating word magic with you!</span> 
+              </div>
+              <!--<div id="divDesp2">
+                  <div id="">
+                      <div style="float:right;position: absolute;margin-top:10px;padding-right:0px;font-size:15px;">
+                          <table>
+                              <th>Notes:</th>
+                              <apex:repeat value="{!notesInvoice}" var="notes">
+                                  <tr>
+                                      <td>{!notes}</td>
+               
+                                  </tr>
+                              </apex:repeat>
+                          </table>
+                      </div>
+                  </div> <br/><br/><br/><br/><br/><br/><br/>
+                  <div style=" position:absolute;padding-right:0px;">
+                      <Span style="padding-left:0px;font-size:15px;text-align:center;"><b> Terms and Conditions:</b> <br/> {!invObj.Terms_and_Conditions__c}</span><br/>
+                  </div>          
+                  <br/><br/><br/><br/><br/><br/>
+                  <div style=" position:absolute;">
+                      <span style="font-size:15px;">Thank you for your business!</span>
+                  </div>
+              </div>-->
+              <apex:pageBlock >
+                  <apex:pageBlockSection >
+                  <div id="">
+                      <div style="position:relative;margin-top:10px;padding-right:0px;font-size:15px;">
+                          <span  class="text" style="font-size:15px;"> <b>Notes: </b></span>
+                          <table>
+                              <apex:repeat value="{!notesInvoice}" var="notes">
+                                  <tr>
+                                      <td>{!notes}</td>
+                                  </tr>
+                              </apex:repeat>
+                          </table>
+                      </div>
+                  </div>
+                  </apex:pageBlocksection>
+                  </apex:pageBlock> <br/><br/><br/><br/><br/><br/><br/>
+                  <apex:pageBlock >
+                  <apex:pageBlocksection >
+                  <div style="position:relative;margin-top:25px;padding-right:0px;">
+                      <Span style="font-size:15px;padding-left:0px;"><b> Terms and Conditions:</b> <br/> {!invObj.Terms_and_Conditions__c}</span><br/>
+                  </div>
+                  </apex:pageBlocksection> 
+                  </apex:pageBlock>         
+                  <br/><br/><br/><br/><br/><br/>
+                  <div style=" position:relative;margin-top:25px;">
+                      <span style="font-size:15px;">Thank you for your business!</span>
+                  </div>
+
+          </apex:pageBlock>
+          <!-- Ends Here -->
+        </body>
+       </html>
+</apex:page>

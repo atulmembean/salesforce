@@ -1,0 +1,639 @@
+<apex:page standardStylesheets="false" sidebar="false"  showHeader="false" controller="Registration_Clr" applyBodyTag="false">
+    
+    <style>
+        .modal2 {
+        display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        z-index: 1; /* Sit on top */
+        padding-top: 10%; /* Location of the box */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgb(0,0,0); /* Fallback color */
+        background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+        }
+        
+        /* Modal Content */
+        .modal-content2 {
+        background-color: #fefefe;
+        margin: auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 40%;
+        height:50%;
+        }
+        
+        /* The Close Button */
+        .close2 {
+        color: #aaaaaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        }
+        
+        .close2:hover,
+        .close2:focus {
+        color: #000;
+        text-decoration: none;
+        cursor: pointer;
+        }
+        
+        #addrError{display:none;}
+        
+        label{font-weight:normal !important;}
+        .btn-ashvd{background-color:#0ebdf7 !important;color:#FFF !important;padding:6px 15px !important;}
+        .btn-ashvd-submit{background-color:#24aa98 !important;color:#FFF !important;padding:6px 15px !important;}
+        
+        .addressChange{top:10%!important; background-color:#ffffff!important; position :absolute!important;
+        border-radius:5px!important; border:2px solid ##e3e2e2!important; padding:10px 0px!important;
+        z-index:2!important; margin-bottom:50px!important;
+        }
+        
+        
+    </style>
+    <html lang="en">
+        <head>
+            
+            <title>Teacher Registration</title>
+            
+            <!-- Bootstrap core CSS -->
+            <apex:stylesheet value="{!URLFOR($Resource.CustomFiles,'/MemBean/css/bootstrap.min.css' )}" />
+            <apex:stylesheet value="{!URLFOR($Resource.CustomFiles,'/MemBean/css/bootstrap-reset.css' )}" />
+            
+            <!--external css-->
+            <apex:stylesheet value="{!URLFOR($Resource.CustomFiles,'/MemBean/css/font-awesome.css' )}" />
+            
+            <!-- Custom styles for this template -->
+            <apex:stylesheet value="{!URLFOR($Resource.CustomFiles,'/MemBean/css/style.css' )}" />
+            <apex:stylesheet value="{!URLFOR($Resource.CustomFiles,'/MemBean/css/style-responsive.css' )}" />
+            <apex:stylesheet value="{!URLFOR($Resource.CustomFiles,'/MemBean/css/jquery-ui-1.10.4.custom.css' )}" />
+            
+            
+            <!--Javascript Link-->
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+            <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+            
+            <!--stylesheet  for the page -->
+            <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"/>
+            <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous" />
+            <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous" />
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.11.2/css/bootstrap-select.min.css" />
+            
+        </head>
+        <body>
+            
+            <!-- header part -->
+            <!--main content start-->
+            
+            <section class="wrapper">
+                <div class="col-lg-offset-2">
+                    
+                    <div class="col-lg-9">
+                        
+                        
+                        <section class="panel">
+                            <header class="panel-heading">
+                                <div class="row">
+                                    <div class="col-lg-4"><img src="https://lifelonglearninglab.files.wordpress.com/2014/08/membean-logo.jpg" height="75" width="180"/></div>
+                                    <div class="col-lg-5"><h2><b>Teacher Registration</b></h2></div>
+                                </div>
+                            </header>
+                            <div class="panel-body">
+                                <!--  <form role="form" method="POST" action="http://crm.membean.com/index.php?entryPoint=thankYou">-->
+                                <div class="col-lg-offset-1">
+                                    
+                                    <br/>
+                                    <div class="row">
+                                        <div class="col-lg-2">State</div>
+                                        <div class="col-lg-8">
+                                            <select class="form-control" name="State" id="State" onchange="getCitiesByState(this);">
+                                                
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <br/>
+                                    <div class="row">
+                                        <div class="col-lg-2">City</div>
+                                        <div class="col-lg-8"><input type="text" class="form-control" name="City" id="City" placeholder="City" onblur="getSchoolsByCity(this);"/></div>
+                                    </div>
+                                    
+                                    <br/>
+                                    
+                                    <div class="row">
+                                        <div class="col-lg-2">School</div>
+                                        <div class="col-lg-8"><input type="text" class="form-control" name="School" id="School" placeholder="School"/>
+                                            <p class="text-danger" style="display:none">This field is required.</p>
+                                        </div>
+                                        
+                                    </div>
+                                    
+                                    <br/>
+                                    
+                                    <div class="row">
+                                        <div class="col-lg-2">First Name</div>
+                                        <div class="col-lg-3"><input type="text" required="true" class="form-control" name="fname" id="fname" placeholder="First Name"/></div>
+                                        <div class="col-lg-2">Last Name</div>
+                                        <div class="col-lg-3"><input type="text" required="true" class="form-control" name="lname" id="lname" placeholder="Last Name"/>
+                                            <p class="text-danger" style="display:none">This field is required.</p>
+                                        </div>
+                                        
+                                    </div>
+                                    
+                                    <br/>
+                                    
+                                    <div class="row">
+                                        <div class="col-lg-2">Email</div>
+                                        <div class="col-lg-8"><input type="email" required="true" class="form-control" name="Email" id="Email" placeholder="Email"/>
+                                            <p class="text-danger"></p>
+                                        </div>                                              
+                                    </div>
+                                    <br/>
+                                    
+                                    <div class="row">
+                                        <div class="col-lg-2">Role</div>
+                                        <div class="col-lg-8">
+                                            <select class="form-control" name="role" id="role">
+                                                
+                                            </select>
+                                            <p class="text-danger" style="display:none">This field is required.</p>
+                                        </div>
+                                    </div>
+                                    <br/>
+                                    
+                                    <br/>
+                                    <div class="row">
+                                        <div class="col-lg-2">Next Step</div>
+                                        <div class="col-lg-8">
+                                            <select class="form-control" name="nextstep" id="nextstep">
+                                                
+                                            </select>
+                                            <p class="text-danger" style="display:none">This field is required.</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <br/>
+                                    <!-- *********** Its the submit new ************ -->
+                                    <div class="col-lg-offset-5">
+                                        <!--   <button  class="btn btn-info" id="save" onclick="submitApplication()">Submit</button> -->
+                                        <button  class="btn btn-success" id="myBtn" >Submit</button> 
+                                    </div>
+                                </div>
+                                
+                            </div>
+                        </section>
+                        
+                    </div>
+                </div>
+                
+                
+                <!-- The New Modal for Popup -->
+                <div id="myModal" class="modal2">
+                    
+                    <!-- Modal content -->
+                    <div class="modal-content2">
+                        <span class="close2">&times;</span>
+                        <p>One last thing....
+                            <span id="addrError" style="color:red;padding:10px;"></span>
+                            <div class="row">
+                                <div class="col-lg-3" > Phone Number </div>
+                                <div  class="col-lg-4"><input type="phone" Maxlength="10"  id="phone" onkeypress="return isNumber(event)"  value="" class="form-control" placeholder="Phone number"/> </div>             
+                        </div>
+                        <br/>
+                        Many schools have overzealous spam filters and we want to ensure we're able to connect with you.</p>
+                    
+                    <div style="padding:10px;">
+                        <input type="button" value="No, thanks. Email should be fine" class="btn btn-default" id="emailme" onclick="finalsavewithEmail()"/>
+                        &nbsp;&nbsp; 
+                        <input type="button" value="Add my phone number" class="btn btn-success" id="addphone" onclick="finalSaveWithPhone()" />
+                    </div>
+                    
+                </div>
+            </div>
+            
+            <!-- Before Modal for final success popup -->
+            <div class="modal fade" id="myModalDialog" role="dialog">
+                <div class="modal-dialog">
+                    
+                    <!-- Modal content-->
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title">Thank you For Registering</h4>
+                        </div>
+                        <div class="modal-body">
+                            <p>Thank you for registering your details with us. We'll be in touch. </p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+            
+            
+        </section>
+        <!--main content end-->
+        <script type='text/javascript' src="{!URLFOR($Resource.CustomFiles,'/MemBean/js/jquery.js')}"></script>
+        <script type='text/javascript' src="{!URLFOR($Resource.CustomFiles,'/MemBean/js/bootstrap.min.js')}"></script>
+        <apex:stylesheet value="{!URLFOR($Resource.CustomFiles,'/MemBean/css/jquery-ui.css' )}" />
+        <script type='text/javascript' src="{!URLFOR($Resource.CustomFiles,'/MemBean/js/jquery-ui.js')}"></script>
+        
+        
+        <script type="text/javascript">
+        
+        /***** code for entering only number *******/
+        
+        function isNumber(evt) {
+        evt = (evt) ? evt : window.event;
+        var charCode = (evt.which) ? evt.which : evt.keyCode;
+        if (charCode > 31 && (charCode < 48 || charCode > 57)){
+            return false;
+        }
+        return true;
+    }
+       /****** code for entering only number Ends ********/
+ 
+        var schoolList = [];
+        var cityList = [];
+        var stateList = '{!stateList}';
+        var roleList = $.parseJSON('{!roleList}');
+        var nextstep = $.parseJSON('{!nextstep}');
+        //var conferenceList =$.parseJSON('{!conferenceList}');
+        var schoolListEntry = [];
+        var parseStateList = $.parseJSON(stateList);
+        var isSchoolExist = false;
+        var emailRegx = /^([a-z\d!#$%&'*+\-\/=?^_`{|}~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+(\.[a-z\d!#$%&'*+\-\/=?^_`{|}~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+)*|"((([ \t]*\r\n)?[ \t]+)?([\x01-\x08\x0b\x0c\x0e-\x1f\x7f\x21\x23-\x5b\x5d-\x7e\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|\\[\x01-\x09\x0b\x0c\x0d-\x7f\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))*(([ \t]*\r\n)?[ \t]+)?")@(([a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF][a-z\d\-._~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]*[a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])\.)+([a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF][a-z\d\-._~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]*[a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])\.?$/i;
+        function selectUIHelper(element,list){
+            var option = '';
+            list.unshift('Select');
+            for (var i=0;i<list.length;i++){
+                option += '<option value="'+ list[i] + '">' + list[i] + '</option>';
+            }
+            $('#'+element).append(option);                       
+        }
+        selectUIHelper('State',parseStateList);    
+        selectUIHelper('role',roleList); 
+        selectUIHelper('nextstep',nextstep); 
+        //selectUIHelper('conference',conferenceList);
+        function cityUIHelper(cityList){
+            
+            for(var cCount = 0; cCount < cityList.length; cCount++){
+                if(typeof cityList[cCount].City__c != "undefined"){
+                    cityList.push(cityList[cCount].City__c);
+                }
+            }
+            $("#City").autocomplete({
+                minLength: 1,
+                delay: 100,
+                source:cityList
+                
+            });
+  
+        }
+        function getCitiesByState(item) {
+            var state = $('#State').val();   
+            Registration_Clr.getCities(state, function (response, event) {
+                if (event.status) {
+                    if(response != null){
+                        cityUIHelper($.parseJSON(response));
+                    }
+                    
+                }
+                else {
+                    
+                }
+            }, { escape: false, buffer: true });
+            
+        }
+        function schoolUIHelper(schoolList){
+            for(var sCount = 0; sCount < schoolList.length; sCount++){
+                if(typeof schoolList[sCount].Name != "undefined"){
+                    var school = new Object();
+                    school.Name = schoolList[sCount].Name;
+                    school.Id = schoolList[sCount].Id;
+                    schoolListEntry.push(school);
+                    schoolList.push(schoolList[sCount].Name);
+                }
+            } 
+            
+            $("#School").autocomplete({
+                minLength: 1,
+                delay: 100,
+                source:schoolList
+                
+            });
+            
+            
+        }
+        function getSchoolsByCity(item) {
+            Registration_Clr.getSchools($("#State").val(),$("#City").val(), function (response, event) {
+                console.log('***********');
+                console.log(response);
+                console.log(event);
+                if (event.status) {
+                    if(response != null){
+                        schoolUIHelper($.parseJSON(response));
+                    }
+                    
+                }
+                else {
+                    
+                }
+            }, { escape: false, buffer: true });
+            
+        }
+        
+        function getselectedSchool(schoolName,callback){
+            if(schoolListEntry.length > 0){
+                for(sList = 0; sList < schoolListEntry.length; sList++){
+                    if(schoolListEntry[sList].Name.toLowerCase() == schoolName.toLowerCase()){
+                        callback(schoolListEntry[sList].Id,true);
+                    }
+                    else{
+                        callback(schoolListEntry[sList].Name,false);
+                    }
+                }
+            }  
+            else{
+                callback('',false);
+            }
+            
+        }
+        
+        var leadRecord = new Object();
+        /*    function submitApplication(){
+                var checkvalidate = true;
+                if(checkvalidate){
+                    if($("#lname").val() == "" || $("#role").val()=="select" || $("#School").val()=="" || $("#Email").val()=="" || $("#nextstep").val()=="select"){
+                        if($("#lname").val() == ""){
+                            $("#lname").next().css('display','block');
+                        }
+                        else{
+                            $("#lname").next().css('display','none');
+                        }
+                        if($("#Email").val()==""){
+                            $("#Email").next().html('This field is required.');
+                        }
+                        else{
+                            $("#Email").next().html('');
+                        }
+                        if($("#School").val()==""){
+                            $("#School").next().css('display','block');
+                        }
+                        else{
+                            $("#School").next().css('display','none');
+                        }
+                        if($("#role").val()=="Select"){
+                            $("#role").next().css('display','block');
+                        }
+                        else{
+                            $("#role").next().css('display','none');
+                        }
+                        if($("#nextstep").val()=="Select"){
+                            $("#nextstep").next().css('display','block');
+                        }
+                        else{
+                            $("#nextstep").next().css('display','none');
+                        }
+                    }
+                    else{
+                        if(emailRegx.test($("#Email").val())){
+                            checkvalidate = false;
+                            $("#Email").next().html('');
+                        }
+                        else{
+                            
+                            $("#Email").next().html('Please enter a valid Email.');
+                        }
+                        
+                        $("#School,#role,#lname,#nextstep").next().css('display','none');
+                    }
+                }    
+                
+                if(!checkvalidate){
+                    $("#save").prop("disabled",true);
+                    // var leadRecord = new Object();
+                    leadRecord.FirstName = $("#fname").val();
+                    leadRecord.LastName = $("#lname").val();
+                    if($("#State").val() == "select"){
+                        leadRecord.State = '';
+                    }
+                    else {
+                        leadRecord.State = $("#State").val()
+                    } 
+                    
+                    leadRecord.City = $("#City").val();
+                    leadRecord.Email = $("#Email").val();
+                    leadRecord.Role__c = $("#role").val();
+                    leadRecord.Additional_Comments__c = $("#Comments").val();
+                    leadRecord.Next_Step__c = $("#nextstep").val();
+                    getselectedSchool($("#School").val(),function(result,isSchoolExist){
+                        if(isSchoolExist){
+                            leadRecord.School_Account__c =result; 
+                            leadRecord.Company = $("#School").val();
+                        }   
+                        else{
+                            leadRecord.Company = $("#School").val();
+                        }
+                    });
+                     Registration_Clr.createLead(leadRecord, function (response, event) {
+                        if (event.status) {
+                            if(response){
+                                $("#myModal").modal("show");
+                            }
+                            $("#myModal").on('hidden.bs.modal', function () {
+                                location.reload();
+                            });
+                        }
+                        else {
+                            
+                        }
+                    }, { escape: false, buffer: true }); 
+                    
+                }    
+                
+            }   */ 
+        
+        if('{!stateDefault}' != undefined && '{!stateDefault}' != null && '{!stateDefault}' != ''){
+            var sDfault = '{!stateDefault}';   
+            $("#State option[value='"+sDfault+"']").prop("selected", true);
+            getCitiesByState(sDfault);
+        }
+        
+        
+        
+        // Get the modal
+        var modal2 = document.getElementById('myModal');
+        
+        // Get the button that opens the modal2
+        var btn = document.getElementById("myBtn");
+        
+        // Get the <span> element that closes the modal2
+        var span = document.getElementsByClassName("close2")[0];
+        
+        // When the user clicks the button, open the modal2 
+        btn.onclick = function() {
+            debugger;
+            if(! SubmitWindow())
+                modal2.style.display = "block";
+        }
+        
+        
+        // When the user clicks on <span> (x), close2 the modal2
+        span.onclick = function() {
+            modal2.style.display = "none";
+        }
+        
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function(event) {
+            if (event.target == modal2) {
+                modal2.style.display = "none";
+            }
+        }
+        
+        /* **Function Code to validate form fields Ends ** */  
+        function SubmitWindow(){
+            
+            var checkvalidate = true;
+            if(checkvalidate){
+                if($("#lname").val() == "" || $("#role").val()=="select" || $("#School").val()=="" || $("#Email").val()=="" || $("#nextstep").val()=="select"){
+                    if($("#lname").val() == ""){
+                        $("#lname").next().css('display','block');
+                    }
+                    else{
+                        $("#lname").next().css('display','none');
+                    }
+                    if($("#Email").val()==""){
+                        $("#Email").next().html('This field is required.');
+                    }
+                    else{
+                        $("#Email").next().html('');
+                    }
+                    if($("#School").val()==""){
+                        $("#School").next().css('display','block');
+                    }
+                    else{
+                        $("#School").next().css('display','none');
+                    }
+                    if($("#role").val()=="Select"){
+                        $("#role").next().css('display','block');
+                    }
+                    else{
+                        $("#role").next().css('display','none');
+                    }
+                    if($("#nextstep").val()=="Select"){
+                        $("#nextstep").next().css('display','block');
+                    }
+                    else{
+                        $("#nextstep").next().css('display','none');
+                    }
+                }
+                else{
+                    if(emailRegx.test($("#Email").val())){
+                        checkvalidate = false;
+                        $("#Email").next().html('');
+                    }
+                    else{
+                        
+                        $("#Email").next().html('Please enter a valid Email.');
+                    }
+                    
+                    $("#School,#role,#lname,#nextstep").next().css('display','none');
+                }
+            }    
+            
+            if(!checkvalidate){
+                $("#save").prop("disabled",true);
+                // var leadRecord = new Object();
+                leadRecord.FirstName = $("#fname").val();
+                leadRecord.LastName = $("#lname").val();
+                if($("#State").val() == "select"){
+                    leadRecord.State = '';
+                }
+                else {
+                    leadRecord.State = $("#State").val()
+                } 
+                
+                leadRecord.City = $("#City").val();
+                leadRecord.Email = $("#Email").val();
+                leadRecord.Role__c = $("#role").val();
+                leadRecord.Additional_Comments__c = $("#Comments").val();
+                leadRecord.Next_Step__c = $("#nextstep").val();
+                getselectedSchool($("#School").val(),function(result,isSchoolExist){
+                    if(isSchoolExist){
+                        leadRecord.School_Account__c =result; 
+                        leadRecord.Company = $("#School").val();
+                    }   
+                    else{
+                        leadRecord.Company = $("#School").val();
+                    }
+                });
+            }  
+            
+            return checkvalidate;
+        }
+        /* **Function Code to validate form fields Ends ** */       
+        
+        function finalSaveWithPhone(){
+            //alert('calling this');
+            var  adrError=[];
+            if($('#phone').val().trim().length==0){
+                adrError.push(' Phone Number');                          
+            }
+            debugger;
+            if(adrError.length>0){
+                $('#addrError').html('Please enter the '+adrError);
+                $('#addrError').css({'display':'block'});
+                return;
+            }else{
+                $('#addrError').css({'display':'none'});
+            }
+            
+            leadRecord.Phone= $("#phone").val();
+            console.log(leadRecord);
+            Registration_Clr.createLead(leadRecord, function (response, event) {
+                if (event.status) {
+                    if(response){
+                        modal2.style.display = "none";
+                        $("#myModalDialog").modal("show");
+                    }
+                    $("#myModalDialog").on('hidden.bs.modal', function () {
+                        location.reload();
+                    });
+                }
+                else {
+                    
+                }
+                
+            }, { escape: false, buffer: true });
+            
+        }
+        function finalsavewithEmail(){
+            console.log(leadRecord);
+            Registration_Clr.createLead(leadRecord, function (response, event) {
+                if (event.status) {
+                    if(response){
+                        modal2.style.display = "none";
+                        $("#myModalDialog").modal("show");
+                    }
+                    $("#myModalDialog").on('hidden.bs.modal', function () {
+                        location.reload();
+                    });
+                }
+                else {
+                    
+                }
+                
+            }, { escape: false, buffer: true });
+            
+        }
+        /***Validation method code ends here***/
+        
+        </script>
+        
+    </body>
+</html>
+</apex:page>

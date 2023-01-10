@@ -1,0 +1,27 @@
+<aura:component controller="SplitSchoolDetailsController_v1" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+	<aura:attribute type="String" name="recordId" default="" />
+    <aura:attribute type="String" name="message" default="Invoice can be created only for Accepted Quote." />
+    <aura:attribute name="quoteList" type="Quote" /> <!-- Attribute - All Quote related Information-->
+    
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    
+    <br/><br/>
+  	<aura:if isTrue="{!v.quoteList.Status=='Accepted'}">
+        <aura:if isTrue="{!v.quoteList.Invoice_Count__c >=1}">
+            <ui:outputText aura:id="quoteMessage" value="{! 'Already'+' ' +v.quoteList.Invoice_Count__c+ ' '+'invoice created' }" />
+            <aura:set attribute="else">
+                <span>Create Invoice Records?</span>
+                <div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_offline" role="alert">
+                    <span class="slds-assistive-text">error</span>
+                    <lightning:button variant="brand" label="Create" onclick="{!c.handleClick}"/>
+                </div>
+            </aura:set>
+        </aura:if> 
+        <aura:set attribute="else">
+            <span style="font-size:15px;align:center;font-weight:20px;">{!v.message}</span>
+        </aura:set> 
+    </aura:if>
+        
+   
+   
+</aura:component>
